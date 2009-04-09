@@ -1,0 +1,21 @@
+= Babel-icious
+
+A flexible and scalable mapping tool, which currently only supports mapping from xml to hash.
+
+
+== Author
+
+
+* Chris Wyckoff -- cwyckoff@leadmediapartners.com
+
+
+== General Info
+
+
+coming soon.
+
+
+== Examples
+
+
+coming soon.
