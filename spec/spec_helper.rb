@@ -1,14 +1,7 @@
-ENV["MAPPOO"] = "test"
 require 'rubygems'
 require 'spec'
-require 'ruby-debug'
-require File.expand_path(File.dirname(__FILE__) + "/../target_mapper")
-require File.expand_path(File.dirname(__FILE__) + "/../mapping_direction")
-require File.expand_path(File.dirname(__FILE__) + "/../factories")
-require File.expand_path(File.dirname(__FILE__) + "/../path_translator")
-require File.expand_path(File.dirname(__FILE__) + "/../xml_map")
-require File.expand_path(File.dirname(__FILE__) + "/../hash_map")
-require File.expand_path(File.dirname(__FILE__) + "/../mapper")
+$:.unshift(File.dirname(__FILE__) + '/../lib')
+require 'babel_icious'
 
 alias :running :lambda
 
