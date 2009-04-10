@@ -20,7 +20,9 @@ class Mapper
       current_target_mapper.register_mapping(opts)
     end
 
-    def translate(key, source)
+    def translate(key=nil, source=nil)
+      raise MapperError, "No target mapper exists for key #{key}" unless mappings.has_key?(key)
+      
       mappings[key].map(source)
     end
 

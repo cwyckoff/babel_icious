@@ -60,6 +60,7 @@ describe "Mapper" do
   describe ".translate" do 
 
     before(:each) do
+      @xml = '<foo><bar>baz</baz></foo>'
       Mapper.reset
       Mapper.config(:foo) do |m| 
         m.direction = {:from => :xml, :to => :hash}
@@ -69,12 +70,18 @@ describe "Mapper" do
 
     it "should map target elements" do 
       # expect
-      @target_mapper.should_receive(:map).with(xml = '<foo><bar>baz</baz></foo>').and_return({})
+      @target_mapper.should_receive(:map).with(@xml).and_return({})
 
       # given
-      Mapper.translate(:foo, xml)
+      Mapper.translate(:foo, @xml)
     end
-    
+  
+    describe "when no key exists for target mapper" do 
+      
+      it "should raise an error" do 
+        running { Mapper.translate(:bar, @xml) }.should raise_error(MapperError)
+      end
+    end
     
   end
   

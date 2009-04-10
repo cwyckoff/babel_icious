@@ -19,7 +19,7 @@ class TargetMapper
     
     case @direction[:to]
     when :xml
-      ''
+      XML::Document.new()
     when :hash
       {}
     end
@@ -37,7 +37,7 @@ class TargetMapper
   def register_mapping(opts={})
     raise TargetMapperError, "Both :from and :to keys must be set (e.g., {:from => \"foo/bar\", :to => \"bar/foo\")" unless (opts[:from] && opts[:to])
 
-    @mappings << [SourceMap.instance(@direction, opts), TargetMap.instance(@direction, opts)]
+    @mappings << [MapFactory.source(@direction, opts), MapFactory.target(@direction, opts)]
   end
   
   def reset

@@ -3,8 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
 describe TargetMapper do 
   
   before(:each) do
-    SourceMap.stub!(:instance).and_return(@source_element = mock("XmlMap", :value_from => "bar"))
-    TargetMap.stub!(:instance).and_return(@target_element = mock("HashMap", :map_from => {}))
+    MapFactory.stub!(:source).and_return(@source_element = mock("XmlMap", :value_from => "bar"))
+    MapFactory.stub!(:target).and_return(@target_element = mock("HashMap", :map_from => {}))
     @target_mapper = TargetMapper.new
     @target_mapper.direction = {:from => :xml, :to => :hash}
     @opts = {:to => "bar/foo", :from => "foo/bar"}
@@ -51,13 +51,13 @@ describe TargetMapper do
 
     it "should instantiate 'from' mapping element" do 
       during_process { 
-        SourceMap.should_receive(:instance).with(@target_mapper.direction, @opts).and_return(@source_element)
+        MapFactory.should_receive(:source).with(@target_mapper.direction, @opts).and_return(@source_element)
       }
     end
 
     it "should instantiate 'to' mapping element" do 
       during_process { 
-        TargetMap.should_receive(:instance).with(@target_mapper.direction, @opts).and_return(@target_element)
+        MapFactory.should_receive(:target).with(@target_mapper.direction, @opts).and_return(@target_element)
       }
     end
     

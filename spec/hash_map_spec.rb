@@ -1,8 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
 
 describe HashMap do 
-  
-  describe "#map" do 
+
+  describe "#map_from" do 
 
     before(:each) do
       @target_hash = {}
@@ -25,6 +25,20 @@ describe HashMap do
       after_process { 
         @target_hash.should == {"bar" => "foo"}
       }
+    end
+    
+  end
+  
+  describe "#value_from" do 
+
+    before(:each) do
+      @target_hash = {}
+      path_translator = PathTranslator.new("foo/bar")
+      @hash_map = HashMap.new(path_translator)
+    end
+    
+    it "should map value of element in path" do 
+      @hash_map.value_from({:foo => {:bar => "baz"}}).should == "baz"
     end
     
   end
