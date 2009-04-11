@@ -13,81 +13,55 @@ class XmlMap
   end
 
   def map_from(xml_output, source)
-    flag = false
-    path = "/"
-    nodes = []
+    @index = @path_translator.parsed_path.size - 1
 
-    @path_translator.each_with_index do |element, index|
-      if xml_output.root.nil?
-        xml_output.root = XML::Node.new(element)
-      else
-        path += "/#{element}"
-        x_path = xml_output.find("#{path}")
-        if x_path.empty?
-          unless nodes.empty?
-            nodes.last << XML::Node.new(element)
-            nodes.last.child << source.strip if (index == @path_translator.parsed_path.size-1)
-          else
-            # check for parent using xpath
-            parent_node = previous_node(xml_output, path)
-            if parent_node && (index == @path_translator.parsed_path.size-1)
-              new_node = XML::Node.new(element)
-              new_node << source.strip
-              if(parent_node.is_a?(LibXML::XML::Document))
-                parent_node = parent_node.root
-              end 
-              parent_node << new_node
-              nodes << parent_node
-              flag = true
-            else
-              nodes << XML::Node.new(element)
-              nodes.last << source.strip if (index == @path_translator.parsed_path.size-1)
-            end
-          end
-        end
-      end
+    if xml_output.root.nil?
+      xml_output.root = XML::Node.new(root_element)
+    end 
 
-      unless flag
-        nodes.each do |node|
-          xml_output.root << node
-          node = nil
-        end
-      end
-    end
+    unless(update_node?(xml_output, source))
+      populate_nodes(xml_output)
+      map_from(xml_output, source)
+    end 
   end
   
   private
   
-  def previous_node(xml_output, path)
-    previous_path = path.split("/")
-    previous_path.pop
-    node = xml_output.find(previous_path.join("/"))
+  def populate_nodes(xml_output)
+    return if @index == 0
+
+    if(node = previous_node?(xml_output))
+      new_node = XML::Node.new(current_element)
+      node << new_node
+    else 
+      populate_nodes(xml_output)
+    end 
+  end
+  
+  def current_element
+    @path_translator.parsed_path[@index+1]
+  end
+
+  def previous_element
+    @path_translator.parsed_path[@index]
+  end
+  
+  def previous_node?(xml_output)
+    @index -= 1
+    node = xml_output.find("//#{@path_translator.parsed_path[0..@index].join("/")}")
     node[0]
   end
+  
+  def root_element
+    @path_translator.parsed_path[0]
+  end
+  
+  def update_node?(xml_output, source)
+    node = xml_output.find("/#{@path_translator.full_path}")
+    unless(node.empty?)
+      node[0] << source.strip
+      return true
+    end 
+    false
+  end
 end
-
-
-#     path = "/"
-#     nodes = []
-#     @path_translator.each_with_index do |element, index|
-#       if xml_output.root.nil?
-#         xml_output.root = XML::Node.new(element)
-#       else
-#         path += "/#{element}"
-#         x_path = xml_output.find("#{path}")
-#         if x_path.empty?
-#           unless nodes.empty?
-#             nodes.last << XML::Node.new(element)
-#             nodes.last.child << source.strip if (index == @path_translator.parsed_path.size-1)
-#           else
-#             nodes << XML::Node.new(element)
-#             nodes.last << source.strip if (index == @path_translator.parsed_path.size-1)
-#           end
-#         end
-#       end
-
-#       nodes.each do |node|
-#         xml_output.root << node
-#         node = nil
-#       end
-#     end
