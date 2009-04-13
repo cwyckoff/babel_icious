@@ -1,6 +1,6 @@
 = Babel-icious
 
-A flexible and scalable mapping tool, which currently only supports mapping from xml to a hash and from a hash to xml
+A flexible and scalable mapping tool that currently only supports mapping hashes and xml.
 
 
 == Author
