@@ -47,7 +47,11 @@ the slash indicates that "bar" is a nested hash within "foo".  The target xml th
 with the value of "bar" from the hash above placed in the nested <foo> tags in the xml.
 
 
-When you want to translate the mappings, simply call Mapper.translate(:foo, source), passing the tag for the mapping and the actual source you want to translate from.
+When you want to translate the mappings, simply call:
+
+ Mapper.translate(:foo, source)
+
+passing the tag for the mapping and the actual source you want to translate from.
 
 
 
