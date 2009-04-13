@@ -38,11 +38,11 @@ tells the mapper that the source of the mapping will be xml and the target will 
 
 tell the mapper to place the value of element located at "foo/bar" in position "bar/foo".  Here, the slashes indicate nestings for both hashes and xml.  So, given the hash:
 
-{"foo" => {"bar" => "baz"}}
+ {"foo" => {"bar" => "baz"}}
 
 the slash indicates that "bar" is a nested hash within "foo".  The target xml then should be mapped as
 
-<bar><foo>baz</foo></bar>
+ <bar><foo>baz</foo></bar>
 
 with the value of "bar" from the hash above placed in the nested <foo> tags in the xml.
 
