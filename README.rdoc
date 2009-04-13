@@ -17,14 +17,16 @@ Add a mapper for JSON.
 
 Mappings are set up by calling passing mapping 'coordinates' to a 'config' block on the Mapper class:
 
-Mapper.config(:foo) do |m|
- m.direction = {:from => :xml, :to => :hash}
-
- m.map :from => "foo/bar", :to => "bar/foo"
- m.map :from => "foo/baz", :to => "bar/boo"
- m.map :from => "foo/cuk/coo", :to => "foo/bar/coo"
- m.map :from => "foo/cuk/doo", :to => "doo"
-end
+ Mapper.config(:foo) do |m|
+  
+  m.direction = {:from => :xml, :to => :hash}
+  
+  m.map :from => "foo/bar", :to => "bar/foo"
+  m.map :from => "foo/baz", :to => "bar/boo"
+  m.map :from => "foo/cuk/coo", :to => "foo/bar/coo"
+  m.map :from => "foo/cuk/doo", :to => "doo"
+  
+ end
 
 The 'config' method takes a symbol as its first argument which serves as an identification tag for that mapping.  The second argument is a block where you indiate the details of your mapping.  This should include a direction indicator and individual mapping 'coordinates'.
 
