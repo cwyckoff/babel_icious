@@ -6,6 +6,38 @@ describe PathTranslator do
     @translator = PathTranslator.new("bar/foo")
   end
 
+  describe "#[]" do 
+    
+    it "should return element from parsed path array at specified index" do 
+      @translator[1].should == "foo"
+    end
+  end
+  
+  describe "#each" do 
+
+    it "should yield path elements array" do 
+      @translator.each do |element|
+        ["bar", "foo"].include?(element).should be_true
+      end
+    end
+    
+  end
+
+  describe "#last_index" do 
+    
+    it "should return index of last element in parsed path array" do 
+      @translator.last_index.should == 1
+    end
+  end
+  
+  describe "#size" do 
+    
+    it "should return size of path elements" do 
+      @translator.size.should == 2
+    end
+    
+  end
+
   describe "#translate" do 
     
     it "should split path elements into array" do 
@@ -23,13 +55,4 @@ describe PathTranslator do
     end
   end
   
-  describe "#each" do 
-
-    it "should yield path elements array" do 
-      @translator.each do |element|
-        ["bar", "foo"].include?(element).should be_true
-      end
-    end
-    
-  end
 end 

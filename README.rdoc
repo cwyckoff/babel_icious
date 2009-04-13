@@ -1,21 +1,52 @@
 = Babel-icious
 
-A flexible and scalable mapping tool, which currently only supports mapping from xml to hash.
+A flexible and scalable mapping tool, which currently only supports mapping from xml to a hash and from a hash to xml
 
 
 == Author
 
-
 * Chris Wyckoff -- cwyckoff@leadmediapartners.com
 
 
-== General Info
+== To Do
 
-
-coming soon.
+Add a mapper for JSON.
 
 
 == Examples
 
+Mappings are set up by calling passing mapping 'coordinates' to a 'config' block on the Mapper class:
 
-coming soon.
+Mapper.config(:foo) do |m|
+ m.direction = {:from => :xml, :to => :hash}
+
+ m.map :from => "foo/bar", :to => "bar/foo"
+ m.map :from => "foo/baz", :to => "bar/boo"
+ m.map :from => "foo/cuk/coo", :to => "foo/bar/coo"
+ m.map :from => "foo/cuk/doo", :to => "doo"
+end
+
+The 'config' method takes a symbol as its first argument which serves as an identification tag for that mapping.  The second argument is a block where you indiate the details of your mapping.  This should include a direction indicator and individual mapping 'coordinates'.
+
+ m.direction = {:from => :xml, :to => :hash}
+
+tells the mapper that the source of the mapping will be xml and the target will be a hash.  And the mapping coordinates
+
+ m.map :from => "foo/bar", :to => "bar/foo"
+
+tell the mapper to place the value of element located at "foo/bar" in position "bar/foo".  Here, the slashes indicate nestings for both hashes and xml.  So, given the hash:
+
+{"foo" => {"bar" => "baz"}}
+
+the slash indicates that "bar" is a nested hash within "foo".  The target xml then should be mapped as
+
+<bar><foo>baz</foo></bar>
+
+with the value of "bar" from the hash above placed in the nested <foo> tags in the xml.
+
+
+When you want to translate the mappings, simply call Mapper.translate(:foo, source), passing the tag for the mapping and the actual source you want to translate from.
+
+
+
+  

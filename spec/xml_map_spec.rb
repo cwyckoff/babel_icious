@@ -5,7 +5,7 @@ describe XmlMap do
   before(:each) do 
     @node = mock("Xml::Document::Node", :content => "baz")
     @source = mock("Xml::Document", :find => [@node])
-    @path_translator = mock("PathTranslator", :full_path => "foo/bar")
+    @path_translator = PathTranslator.new("foo/bar")
     @xml_map = XmlMap.new(@path_translator)
   end
   
@@ -20,29 +20,60 @@ describe XmlMap do
   describe "#map_from" do 
     
     before(:each) do
-      @target_xml = mock("Xml::Document")
-      @path_translator = mock("PathTranslator", :parsed_path => ["bar"])
-      @xml_map = XmlMap.new(@path_translator)
-      @path_translator.stub!(:inject_with_index).and_yield(@target_xml, "bar", 0)
+      XML::Node.stub!(:new).and_return(@xml_node = mock("XML::Node", :empty? => false, :<< => nil))
+      @target_xml = mock("XML::Document", :root => nil, :find => [@xml_node], :root= => nil)
     end
     
     def do_process 
       @xml_map.map_from(@target_xml, 'foo')
     end 
 
-    it "should set value in target map" do 
+    it "should set root element in xml" do 
       during_process { 
-        pending
-#        @path_translator.should_receive(:inject_with_index).with(@target_xml)
+        @target_xml.should_receive(:root=).with(@xml_node)
       }
     end
     
-    it "should apply value of source to key of target" do 
-      pending
-      after_process { 
-        @target_xml.should == '<bar>foo</bar>'
-      }
+    describe "when node is updated" do 
+
+      it "should set value in target node" do 
+        during_process { 
+          @xml_node.should_receive(:<<).with("foo")
+        }
+      end
     end
     
+  end
+
+  describe "functional tests" do 
+    
+    describe "#map_from" do 
+      
+      describe "when node is not updated" do 
+        
+        before(:each) do 
+          @xml_target = XML::Document.new
+          @target_xml.stub!(:find).and_return([])
+          @new_node = mock(@xml_node = mock("XML::Node", :empty? => false, :<< => nil))
+        end
+
+        def do_process
+          @xml_map.map_from(@xml_target, 'baz')
+        end 
+        
+        it "should populate parent nodes of target child" do 
+          after_process { 
+            @xml_target.to_s.should =~ /<foo>/
+          }
+        end
+
+        it "should populate target child node" do 
+          after_process { 
+            @xml_target.to_s.should =~ /<bar>baz/
+          }
+        end
+      end
+      
+    end
   end
 end

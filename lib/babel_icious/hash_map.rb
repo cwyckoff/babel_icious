@@ -11,7 +11,7 @@ class HashMap
         if(hsh[element])
           hsh[element]
         else
-          hsh[element] = (index == @path_translator.parsed_path.size-1 ? source_value : {})
+          hsh[element] = (index == @path_translator.last_index ? source_value : {})
         end 
       end
     end 
@@ -20,7 +20,7 @@ class HashMap
   def value_from(source)
     hash = {}
     @path_translator.inject_with_index(hash) do |hsh, element, index|
-      return hsh[element.to_sym] if (index == @path_translator.parsed_path.size - 1)
+      return hsh[element.to_sym] if (index == @path_translator.last_index)
       if hsh.empty?
         source[element.to_sym]
       else 

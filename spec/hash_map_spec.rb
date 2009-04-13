@@ -6,7 +6,7 @@ describe HashMap do
 
     before(:each) do
       @target_hash = {}
-      @path_translator = mock("PathTranslator", :parsed_path => ["bar"])
+      @path_translator = mock("PathTranslator", :last_index => 0)
       @hash_map = HashMap.new(@path_translator)
       @path_translator.stub!(:inject_with_index).and_yield(@target_hash, "bar", 0)
     end

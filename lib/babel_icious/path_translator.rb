@@ -7,11 +7,24 @@ class PathTranslator
     @parsed_path = translate(untranslated_path)
   end
 
+  def [](index)
+    @parsed_path[index]
+  end
+  
   def each(&block)
     @parsed_path.each(&block)
+  end
+  
+  def last_index
+    @parsed_path.size - 1
+  end
+  
+  def size
+    @parsed_path.size
   end
   
   def translate(untranslated_path)
     untranslated_path.gsub(/^\//, "").split("/")
   end
+
 end
