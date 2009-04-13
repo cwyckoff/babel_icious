@@ -51,7 +51,7 @@ When you want to translate the mappings, simply call:
 
  Mapper.translate(:foo, source)
 
-passing the tag for the mapping (see initial example above) and the actual source you want to translate from.
+passing the tag for the mapping and the actual source you want to translate from.
 
 
 
