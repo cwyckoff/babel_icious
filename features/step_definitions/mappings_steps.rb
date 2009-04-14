@@ -27,8 +27,7 @@ When /^the mapping is translated$/ do
   case @direction
   when "xml to hash"
     xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo>c</coo><doo>d</doo></cuk></foo>' 
-    source = XML::Document.string(xml)
-    @translated_hash = Babelicious::Mapper.translate(:foo, source)
+    @translated_hash = Babelicious::Mapper.translate(:foo, xml)
   when "hash to xml"
     source = {:foo => {:bar => "a", :baz => "b", :cuk => {:coo => "c", :doo => "d"}}}
     @translated_xml = Babelicious::Mapper.translate(:bar, source)

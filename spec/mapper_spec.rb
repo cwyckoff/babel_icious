@@ -72,7 +72,7 @@ module Babelicious
 
       it "should map target elements" do 
         # expect
-        @target_mapper.should_receive(:map).with(@xml).and_return({})
+        @target_mapper.should_receive(:translate).with(@xml).and_return({})
 
         # given
         Mapper.translate(:foo, @xml)

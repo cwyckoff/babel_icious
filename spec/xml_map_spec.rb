@@ -3,12 +3,34 @@ require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
 module Babelicious
   
   describe XmlMap do 
-    
+
     before(:each) do 
       @node = mock("Xml::Document::Node", :content => "baz")
       @source = mock("Xml::Document", :find => [@node])
       @path_translator = PathTranslator.new("foo/bar")
       @xml_map = XmlMap.new(@path_translator)
+    end
+
+    describe ".initial_target" do 
+      
+      it "should return a libxml XML document" do 
+        XML::Document.stub!(:new).and_return(xml_doc = mock("XML::Document"))
+        
+        XmlMap.initial_target.should == xml_doc
+      end
+    end
+
+    describe ".filter_source" do 
+      
+      it "should create a new XML::Document using the source string" do 
+        source = '<foo><bar>baz</bar></foo>'
+
+        # expect
+        XML::Document.should_receive(:string).with(source)
+        
+        # given
+        XmlMap.filter_source(source)
+      end
     end
     
     describe "#value_from" do 

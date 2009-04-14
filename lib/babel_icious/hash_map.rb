@@ -1,6 +1,18 @@
 module Babelicious
 
   class HashMap
+
+    class << self
+      
+      def initial_target
+        {}
+      end
+      
+      def filter_source(source)
+        source
+      end
+      
+    end
     
     def initialize(path_translator)
       @path_translator = path_translator

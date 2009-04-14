@@ -4,6 +4,21 @@ module Babelicious
 
   describe HashMap do 
 
+    describe ".initial_target" do 
+      
+      it "should return an empty hash" do 
+        HashMap.initial_target.should == {}
+      end
+    end
+
+    describe ".filter_source" do 
+      
+      it "should return source unfiltered" do
+        source = {:foo => {:bar => "baz"}}
+        HashMap.filter_source(source).should == source
+      end
+    end
+    
     describe "#map_from" do 
 
       before(:each) do

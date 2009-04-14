@@ -4,6 +4,18 @@ module Babelicious
 
   class XmlMap
     
+    class << self
+      
+      def initial_target
+        XML::Document.new
+      end
+      
+      def filter_source(source)
+        XML::Document.string(source)
+      end
+      
+    end
+    
     def initialize(path_translator)
       @path_translator = path_translator
     end

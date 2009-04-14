@@ -16,10 +16,13 @@ module Babelicious
       @direction = dir
     end
     
-    def map(source)
-      target = initial_target
+    def translate(source)
+      target = nil
       @mappings.each do |source_element, target_element|
-        source_value = source_element.value_from(source)
+        target = target_element.class.initial_target if target.nil?
+        filtered_source = source_element.class.filter_source(source) if filtered_source.nil?
+        
+        source_value = source_element.value_from(filtered_source)
         target_element.map_from(target, source_value)
       end
       target
@@ -34,20 +37,6 @@ module Babelicious
     def reset
       @mappings, @direction = [], nil
     end
-
-    
-    private
-    
-    def initial_target
-      raise TargetMapperError, "please set @direction (e.g., target_mapper.direction = {:from => :xml, :to => :hash}" unless @direction
-      
-      case @direction[:to]
-      when :xml
-        XML::Document.new()
-      when :hash
-        {}
-      end
-    end 
     
   end
 end

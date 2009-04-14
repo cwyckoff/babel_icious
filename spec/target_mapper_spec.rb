@@ -5,6 +5,7 @@ module Babelicious
   describe TargetMapper do 
     
     before(:each) do
+      xml = '<foo>bar</foo>'
       MapFactory.stub!(:source).and_return(@source_element = mock("XmlMap", :value_from => "bar"))
       MapFactory.stub!(:target).and_return(@target_element = mock("HashMap", :map_from => {}))
       @target_mapper = TargetMapper.new
@@ -13,26 +14,34 @@ module Babelicious
       @target_mapper.register_mapping(@opts)
     end
     
-    describe "#map" do 
+    describe "#translate" do 
 
-      it "should map target to elements for mapping" do 
-        # expect
-        @target_element.should_receive(:map_from).and_return({})
-
-        # given
-        @target_mapper.map('<foo>bar</foo>')
+      before(:each) do 
+        @xml = '<foo>bar</foo>'
+        @source_element.stub!(:class).and_return(@xml_map_klass = mock("XmlMapKlass", :filter_source => @xml))
+        @target_element.stub!(:class).and_return(@hash_map_klass = mock("HashMapKlass", :initial_target => {}))
       end
       
-      describe "when direction is not set" do 
-        
-        it "should raise an error" do 
-          # given
-          @target_mapper.reset
-          @target_mapper.register_mapping(@opts)
+      def do_process
+        @target_mapper.translate('<foo>bar</foo>')
+      end
+      
+      it "should map target to elements for mapping" do 
+        during_process { 
+          @target_element.should_receive(:map_from).and_return({})
+        }
+      end
+      
+      it "should delegate the source to the source element for filtering" do 
+        during_process { 
+          @xml_map_klass.should_receive(:filter_source).with(@xml).once
+        }
+      end
 
-          # expect
-          running { @target_mapper.map('<foo>bar</foo>') }.should raise_error(TargetMapperError)
-        end
+      it "should delegate creation of the initial target to the target element" do 
+        during_process { 
+          @hash_map_klass.should_receive(:initial_target).once
+        }
       end
       
     end
