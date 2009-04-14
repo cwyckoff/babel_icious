@@ -3,7 +3,7 @@ Given /^a mapping exists for '(.*)'$/ do |direction|
   
   case @direction
   when "xml to hash"
-    Mapper.config(:foo) do |m|
+    Babelicious::Mapper.config(:foo) do |m|
       m.direction = {:from => :xml, :to => :hash}
 
       m.map :from => "foo/bar", :to => "bar/foo"
@@ -12,7 +12,7 @@ Given /^a mapping exists for '(.*)'$/ do |direction|
       m.map :from => "foo/cuk/doo", :to => "doo"
     end
   when "hash to xml"
-    Mapper.config(:bar) do |m|
+    Babelicious::Mapper.config(:bar) do |m|
       m.direction = {:from => :hash, :to => :xml}
 
       m.map :from => "foo/bar", :to => "bar/foo"
@@ -28,10 +28,10 @@ When /^the mapping is translated$/ do
   when "xml to hash"
     xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo>c</coo><doo>d</doo></cuk></foo>' 
     source = XML::Document.string(xml)
-    @translated_hash = Mapper.translate(:foo, source)
+    @translated_hash = Babelicious::Mapper.translate(:foo, source)
   when "hash to xml"
     source = {:foo => {:bar => "a", :baz => "b", :cuk => {:coo => "c", :doo => "d"}}}
-    @translated_xml = Mapper.translate(:bar, source)
+    @translated_xml = Babelicious::Mapper.translate(:bar, source)
   end
 end
 

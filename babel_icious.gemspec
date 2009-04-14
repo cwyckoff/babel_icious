@@ -12,6 +12,14 @@ spec = Gem::Specification.new do |s|
   s.authors = ["Chris Wyckoff"]
   s.add_dependency('libxml-ruby')
   
-  s.files = (Dir['{README,{lib,spec}/**/*.{rdoc,json,rb,txt,xml,yml}}'])
+  s.files = ["init.rb",
+	     "lib/babel_icious.rb",
+             "lib/babel_icious/hash_map.rb",
+             "lib/babel_icious/map_factory.rb",
+             "lib/babel_icious/xml_map.rb",
+             "lib/babel_icious/mapper.rb",
+             "lib/babel_icious/path_translator.rb",
+             "lib/babel_icious/target_mapper.rb",
+             "lib/babel_icious/core_ext/enumerable.rb"]
 end
  

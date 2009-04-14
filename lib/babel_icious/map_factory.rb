@@ -1,14 +1,19 @@
-class MapFactory
-  
-  class << self
+module Babelicious
+
+  class MapFactory
     
-    def source(direction, opts={})
-      Object.const_get("#{direction[:from].to_s.capitalize}Map").new(PathTranslator.new(opts[:from]))
+    class << self
+      
+      def source(direction, opts={})
+        eval("Babelicious::#{direction[:from].to_s.capitalize}Map").new(PathTranslator.new(opts[:from]))
+      end
+
+      def target(direction, opts={})
+        eval("Babelicious::#{direction[:to].to_s.capitalize}Map").new(PathTranslator.new(opts[:to]))
+      end
+
     end
 
-    def target(direction, opts={})
-      Object.const_get("#{direction[:to].to_s.capitalize}Map").new(PathTranslator.new(opts[:to]))
-    end
+  end 
+end
 
-  end
-end 

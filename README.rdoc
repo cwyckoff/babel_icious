@@ -17,7 +17,7 @@ Add a mapper for JSON.
 
 Mappings are set up by calling passing mapping 'coordinates' to a 'config' block on the Mapper class:
 
- Mapper.config(:foo) do |m|
+ Babelicious::Mapper.config(:foo) do |m|
   
   m.direction = {:from => :xml, :to => :hash}
   
@@ -49,7 +49,7 @@ with the value of "bar" from the hash above placed in the nested <foo> tags in t
 
 When you want to translate the mappings, simply call:
 
- Mapper.translate(:foo, source)
+ Babelicious::Mapper.translate(:foo, source)
 
 passing the tag for the mapping and the actual source you want to translate from.
 
