@@ -1,9 +1,10 @@
-Given /^a mapping exists for '(.*)'$/ do |direction|
-  @direction = direction
+Given /^a mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |source, target, mapping_tag|
+  @direction = {:from => source.to_sym, :to => target.to_sym}
+  @tag = mapping_tag
   
   case @direction
-  when "xml to hash"
-    Babelicious::Mapper.config(:foo) do |m|
+  when {:from => :xml, :to => :hash}
+    Babelicious::Mapper.config(@tag.to_sym) do |m|
       m.direction = {:from => :xml, :to => :hash}
 
       m.map :from => "foo/bar", :to => "bar/foo"
@@ -11,8 +12,8 @@ Given /^a mapping exists for '(.*)'$/ do |direction|
       m.map :from => "foo/cuk/coo", :to => "foo/bar/coo"
       m.map :from => "foo/cuk/doo", :to => "doo"
     end
-  when "hash to xml"
-    Babelicious::Mapper.config(:bar) do |m|
+  when {:from => :hash, :to => :xml}
+    Babelicious::Mapper.config(@tag.to_sym) do |m|
       m.direction = {:from => :hash, :to => :xml}
 
       m.map :from => "foo/bar", :to => "bar/foo"
@@ -23,22 +24,61 @@ Given /^a mapping exists for '(.*)'$/ do |direction|
   end
 end
 
-When /^the mapping is translated$/ do
-  case @direction
-  when "xml to hash"
-    xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo>c</coo><doo>d</doo></cuk></foo>' 
-    @translated_hash = Babelicious::Mapper.translate(:foo, xml)
-  when "hash to xml"
-    source = {:foo => {:bar => "a", :baz => "b", :cuk => {:coo => "c", :doo => "d"}}}
-    @translated_xml = Babelicious::Mapper.translate(:bar, source)
+Given /^a mapping exists for 'hash to xml' with concatenation$/ do
+  Babelicious::Mapper.config(:concatenation) do |m|
+    m.direction = {:from => :xml, :to => :hash}
+
+    m.map :from => "foo/cuk/coo", :to => "foo/bar", :concat_with => "|"
   end
 end
 
-Then /^the xml should be transformed into a properly mapped hash$/ do
-  @translated_hash.should == {"doo"=>"d", "foo"=>{"bar"=>{"coo"=>"c"}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
+Given /^a mapping exists with identical nested nodes$/ do 
+  @direction = {:from => :xml, :to => :hash}
+  @tag = :baz
+
+  Babelicious::Mapper.config(@tag) do |m|
+    m.direction = @direction
+
+    m.map :from => "foo/bar", :to => "bar/foo"
+    m.map :from => "foo/baz", :to => "bar/boo"
+    m.map :from => "foo/cuk", :to => "foo/", :multiple => true
+  end
 end
 
-Then /^the hash should be transformed into a properly mapped xml string$/ do
-  @translated_xml.to_s.gsub(/\s/, '').should == '<?xmlversion="1.0"encoding="UTF-8"?><bar><foo>a</foo><boo>b</boo><cuk><coo>c</coo><doo>d</doo></cuk></bar>'
+When /^the mapping is translated$/ do
+  case @direction
+  when {:from => :xml, :to => :hash}
+    xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo>c</coo><doo>d</doo></cuk></foo>' 
+    @translation = Babelicious::Mapper.translate(@tag.to_sym, xml)
+  when {:from => :hash, :to => :xml}
+    source = {:foo => {:bar => "a", :baz => "b", :cuk => {:coo => "c", :doo => "d"}}}
+    @translation = Babelicious::Mapper.translate(@tag.to_sym, source)
+  end
 end
 
+When /^the mapping with nested nodes is translated$/ do 
+  xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo><id>c</id></coo><coo><id>d</id></coo></cuk></foo>' 
+  @translation = Babelicious::Mapper.translate(@tag.to_sym, xml)
+end
+
+When /^the concatenated mapping is translated$/ do
+  xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo>c</coo><coo>d</coo><coo>e</coo></cuk></foo>' 
+  @translation = Babelicious::Mapper.translate(:concatenation, xml)
+end
+
+Then /^the xml should be correctly mapped$/ do
+  case @direction
+  when {:from => :xml, :to => :hash}
+    @translation.should == {"doo"=>"d", "foo"=>{"bar"=>{"coo"=>"c"}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
+  when {:from => :hash, :to => :xml}
+    @translation.to_s.gsub(/\s/, '').should == '<?xmlversion="1.0"encoding="UTF-8"?><bar><foo>a</foo><boo>b</boo><cuk><coo>c</coo><doo>d</doo></cuk></bar>'    
+  end
+end
+
+Then /^the xml should properly transform nested nodes$/ do
+  @translation.should == {"foo"=>{"cuk" => {"coo" => [{"id" => "c"}, {"id" => "d"}]}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
+end 
+
+Then /^the xml should properly concatenate node content$/ do
+  @translation.should == {"foo"=> {"bar" => "c|d|e"}}
+end 

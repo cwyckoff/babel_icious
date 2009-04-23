@@ -38,7 +38,7 @@ module Babelicious
       it "should map value of element in path" do 
         @xml_map.value_from(@source).should == "baz"
       end
-      
+
     end
     
     describe "#map_from" do 

@@ -1,10 +1,27 @@
-Scenario: Mapping from xml to a hash
-  Given a mapping exists for 'xml to hash'
-  When the mapping is translated
-  Then the xml should be transformed into a properly mapped hash
+Feature: Babel-icious mapping
 
-Scenario: Mapping from hash to xml
-  Given a mapping exists for 'hash to xml'
+Scenario Outline: Mapping from xml to a hash
+  Given a mapping exists for '<Source>' to '<Target>' with tag '<MappingTag>'
   When the mapping is translated
-  Then the hash should be transformed into a properly mapped xml string
+  Then the xml should be correctly mapped
+
+  Examples:
+  | Source | Target | MappingTag |
+  | xml    | hash   | foo 	 |
+  | hash   | xml    | bar 	 |
+
+Scenario: Mapping from xml with multiple nested nodes with same name
+  Given a mapping exists with identical nested nodes
+  When the mapping with nested nodes is translated
+  Then the xml should properly transform nested nodes
+
+# Scenario: Mapping with additional options
+#   Given a mapping exists for '<Source>' to '<Target>' with tag '<MappingTag>'
+#   Given a mapping exists for 'hash to xml' with concatenation
+#   When the concatenated mapping is translated
+#   Then the xml should properly concatenate node content
+
+#   Examples:
+#   | Source | Target | MappingTag |
+#   | xml    | hash   | foo 	 |
 

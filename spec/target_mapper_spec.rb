@@ -6,8 +6,9 @@ module Babelicious
     
     before(:each) do
       xml = '<foo>bar</foo>'
+      @hash_map_klass = mock("HashMapKlass", :initial_target => {})
       MapFactory.stub!(:source).and_return(@source_element = mock("XmlMap", :value_from => "bar"))
-      MapFactory.stub!(:target).and_return(@target_element = mock("HashMap", :map_from => {}))
+      MapFactory.stub!(:target).and_return(@target_element = mock("HashMap", :map_from => {}, :class => @hash_map_klass))
       @target_mapper = TargetMapper.new
       @target_mapper.direction = {:from => :xml, :to => :hash}
       @opts = {:to => "bar/foo", :from => "foo/bar"}
@@ -19,7 +20,6 @@ module Babelicious
       before(:each) do 
         @xml = '<foo>bar</foo>'
         @source_element.stub!(:class).and_return(@xml_map_klass = mock("XmlMapKlass", :filter_source => @xml))
-        @target_element.stub!(:class).and_return(@hash_map_klass = mock("HashMapKlass", :initial_target => {}))
       end
       
       def do_process
@@ -37,12 +37,6 @@ module Babelicious
           @xml_map_klass.should_receive(:filter_source).with(@xml).once
         }
       end
-
-      it "should delegate creation of the initial target to the target element" do 
-        during_process { 
-          @hash_map_klass.should_receive(:initial_target).once
-        }
-      end
       
     end
     
@@ -52,6 +46,7 @@ module Babelicious
         @target_mapper.reset
         @target_mapper.direction = {:from => :xml, :to => :hash}
         @target_mapper.register_mapping(@opts)
+        @source_element.stub!(:class).and_return(@xml_map_klass = mock("XmlMapKlass", :filter_source => @xml))
       end
       
       it "should register target or source mapping" do 
@@ -60,6 +55,27 @@ module Babelicious
         }
       end
 
+      describe "setting target" do 
+
+        describe "when map is called multiple times" do 
+
+          def do_process
+            @target_mapper.reset
+            @target_mapper.direction = {:from => :xml, :to => :hash}
+            @target_mapper.register_mapping({:to => "bar/foo", :from => "foo/bar"})
+            @target_mapper.register_mapping({:to => "bar/baz", :from => "foo/baz"})
+            @target_mapper.register_mapping({:to => "bar/boo", :from => "foo/boo"})
+          end
+          
+          it "should delegate creation of the initial target to the target element" do 
+            during_process { 
+              @hash_map_klass.should_receive(:initial_target).once.and_return({})
+            }
+          end
+          
+        end
+      end
+      
       it "should instantiate 'from' mapping element" do 
         during_process { 
           MapFactory.should_receive(:source).with(@target_mapper.direction, @opts).and_return(@source_element)
@@ -90,6 +106,7 @@ module Babelicious
         # expect
         @target_mapper.mappings.should be_empty
         @target_mapper.direction.should be_nil
+        @target_mapper.target.should be_nil
       end
     end
     

@@ -13,11 +13,11 @@ module Babelicious
       end
       
     end
-    
-    def initialize(path_translator)
-      @path_translator = path_translator
-    end
 
+    def initialize(path_translator, opts)
+      @path_translator, @opts = path_translator, opts
+    end
+    
     def map_from(hash_output, source_value)
       catch :no_value do
         @path_translator.inject_with_index(hash_output) do |hsh, element, index|

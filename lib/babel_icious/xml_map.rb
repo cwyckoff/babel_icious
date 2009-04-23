@@ -16,13 +16,18 @@ module Babelicious
       
     end
     
-    def initialize(path_translator)
-      @path_translator = path_translator
+    def initialize(path_translator, opts)
+      @path_translator, @opts = path_translator, opts
     end
     
     def value_from(source)
       source.find("/#{@path_translator.full_path}").each do |node|
-        return node.content
+        if(node.children.size > 1)
+          content = {}
+          return map_children(node, content)
+        else 
+          return node.content
+        end
       end
     end
 
@@ -38,6 +43,18 @@ module Babelicious
     end
     
     private
+
+    def map_children(node, content)
+      node.children.each do |child|
+        if(content[child.name])
+          content[child.name] = [content[child.name]] unless content[child.name].is_a?(Array)
+          content[child.name] << {child.child.name => child.child.content}
+        else
+          content[child.name] = {child.child.name => child.child.content}
+        end 
+      end
+      return {node.name => content}
+    end
     
     def populate_nodes(xml_output)
       return if @index == 0
