@@ -85,7 +85,7 @@ module Babelicious
       if(node.children.size > 1)
         content = {}
         return map_with_strategies_for_children(node, content)
-      else 
+      else
         return node.content
       end
     end

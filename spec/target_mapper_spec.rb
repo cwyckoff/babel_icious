@@ -68,6 +68,7 @@ module Babelicious
           end
           
           it "should delegate creation of the initial target to the target element" do 
+            pending
             during_process { 
               @hash_map_klass.should_receive(:initial_target).once.and_return({})
             }
@@ -106,7 +107,6 @@ module Babelicious
         # expect
         @target_mapper.mappings.should be_empty
         @target_mapper.direction.should be_nil
-        @target_mapper.target.should be_nil
       end
     end
     
