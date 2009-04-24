@@ -20,7 +20,7 @@ module Babelicious
           
           it "should instantiate XmlMap" do 
             # expect
-            XmlMap.should_receive(:new).with(@path_translator).and_return(@xml_map)
+            XmlMap.should_receive(:new).with(@path_translator, {:from => "foo/bar"}).and_return(@xml_map)
 
             # given
             MapFactory.source(@direction, {:from => "foo/bar"})
@@ -31,7 +31,7 @@ module Babelicious
           
           it "should instantiate HashMap" do 
             # expect
-            HashMap.should_receive(:new).with(@path_translator).and_return(@hash_map)
+            HashMap.should_receive(:new).with(@path_translator, {:from => "foo/bar"}).and_return(@hash_map)
 
             # given
             MapFactory.source({:from => :hash, :to => :xml}, {:from => "foo/bar"})
@@ -49,7 +49,7 @@ module Babelicious
             xml_map = mock("XmlMap")
 
             # expect
-            HashMap.should_receive(:new).with(@path_translator).and_return(@hash_map)
+            HashMap.should_receive(:new).with(@path_translator, {:to => "bar/foo"}).and_return(@hash_map)
 
             # given
             MapFactory.target(@direction, {:to => "bar/foo"})
@@ -64,7 +64,7 @@ module Babelicious
             hash_map = mock("HashMap")
 
             # expect
-            XmlMap.should_receive(:new).with(@path_translator).and_return(@xml_map)
+            XmlMap.should_receive(:new).with(@path_translator, {:to => "bar/foo"}).and_return(@xml_map)
 
             # given
             MapFactory.target({:from => :hash, :to => :xml}, {:to => "bar/foo"})

@@ -1,7 +1,7 @@
 require 'xml'
 
 module Babelicious
-
+  
   class XmlMap
     
     class << self
@@ -16,18 +16,14 @@ module Babelicious
       
     end
     
-    def initialize(path_translator, opts)
+    def initialize(path_translator, opts={})
       @path_translator, @opts = path_translator, opts
+      @xml_value_mapper = XmlValueMapper.new(@opts)
     end
     
     def value_from(source)
       source.find("/#{@path_translator.full_path}").each do |node|
-        if(node.children.size > 1)
-          content = {}
-          return map_children(node, content)
-        else 
-          return node.content
-        end
+        return @xml_value_mapper.map(node)
       end
     end
 
@@ -43,18 +39,6 @@ module Babelicious
     end
     
     private
-
-    def map_children(node, content)
-      node.children.each do |child|
-        if(content[child.name])
-          content[child.name] = [content[child.name]] unless content[child.name].is_a?(Array)
-          content[child.name] << {child.child.name => child.child.content}
-        else
-          content[child.name] = {child.child.name => child.child.content}
-        end 
-      end
-      return {node.name => content}
-    end
     
     def populate_nodes(xml_output)
       return if @index == 0
@@ -77,6 +61,7 @@ module Babelicious
       if xml_output.root.nil?
         xml_output.root = XML::Node.new(@path_translator[0])
       end 
+
     end
     
     def update_node?(xml_output, source_value)
@@ -89,4 +74,96 @@ module Babelicious
     end
   end
 
+  
+  class XmlValueMapper
+    
+    def initialize(opts={})
+      @opts = opts
+    end
+    
+    def map(node)
+      if(node.children.size > 1)
+        content = {}
+        return map_with_strategies_for_children(node, content)
+      else 
+        return node.content
+      end
+    end
+
+    private
+    
+    def map_with_strategies_for_children(node, content)
+      if @opts[:concatenate]
+        XmlMappingStrategies::Concatenate.map(node, @opts[:concatenate])
+      else 
+        XmlMappingStrategies::ChildNodeMapper.map(node, content)
+      end
+    end
+  end
+  
+  
+  module XmlMappingStrategies
+
+    class Concatenate
+      
+      class << self
+        
+        def map(node, concat_value)
+          concatenated_children = node.children.inject('') {|a,b| a << "#{b.content}#{concat_value}"}
+          {node.name => concatenated_children.chop}
+        end
+
+      end
+    end
+    
+    class ChildNodeMapper
+
+      class << self
+
+        def map(node, content)
+          node.children.each do |child|
+            if(content[child.name])
+              update_content_key(content, child)
+            else
+              create_content_key(content, child)
+            end 
+          end
+          {node.name => content}
+        end
+        
+        private
+        
+        def content_value_is_array?(content, child) 
+          content[child.name].is_a?(Array)
+        end 
+        
+        def create_content_key(content, child)
+          unless grandchild_is_final_node(child)
+            content[child.name] = {child.child.name => child.child.content}
+          else 
+            set_grandchild_value_in_array(content, child)
+          end
+        end
+        
+        def grandchild_is_final_node(child)
+          child.child.name == "text"        
+        end
+        
+        def set_grandchild_value_in_array(content, child)
+          content[child.name] = [] unless content_value_is_array?(content, child) 
+          content[child.name] << child.child.content
+        end
+
+        def update_content_key(content, child)
+          unless grandchild_is_final_node(child)
+            content[child.name] = [content[child.name]] unless content_value_is_array?(content, child) 
+            content[child.name] << {child.child.name => child.child.content}
+          else 
+            set_grandchild_value_in_array(content, child)
+          end
+        end
+      end
+    end
+    
+  end
 end

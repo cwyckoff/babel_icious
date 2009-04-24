@@ -15,13 +15,8 @@ Scenario: Mapping from xml with multiple nested nodes with same name
   When the mapping with nested nodes is translated
   Then the xml should properly transform nested nodes
 
-# Scenario: Mapping with additional options
-#   Given a mapping exists for '<Source>' to '<Target>' with tag '<MappingTag>'
-#   Given a mapping exists for 'hash to xml' with concatenation
-#   When the concatenated mapping is translated
-#   Then the xml should properly concatenate node content
-
-#   Examples:
-#   | Source | Target | MappingTag |
-#   | xml    | hash   | foo 	 |
+Scenario: Mapping with additional options
+  Given a mapping exists with concatenation
+  When the concatenated mapping is translated
+  Then the xml should properly concatenate node content
 

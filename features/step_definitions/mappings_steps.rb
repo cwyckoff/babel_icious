@@ -24,11 +24,11 @@ Given /^a mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |source, targ
   end
 end
 
-Given /^a mapping exists for 'hash to xml' with concatenation$/ do
+Given /^a mapping exists with concatenation$/ do
   Babelicious::Mapper.config(:concatenation) do |m|
     m.direction = {:from => :xml, :to => :hash}
 
-    m.map :from => "foo/cuk/coo", :to => "foo/bar", :concat_with => "|"
+    m.map :from => "foo/cuk", :to => "foo/bar", :concatenate => "|"
   end
 end
 
@@ -41,7 +41,7 @@ Given /^a mapping exists with identical nested nodes$/ do
 
     m.map :from => "foo/bar", :to => "bar/foo"
     m.map :from => "foo/baz", :to => "bar/boo"
-    m.map :from => "foo/cuk", :to => "foo/", :multiple => true
+    m.map :from => "foo/cuk", :to => "foo/"
   end
 end
 
@@ -80,5 +80,5 @@ Then /^the xml should properly transform nested nodes$/ do
 end 
 
 Then /^the xml should properly concatenate node content$/ do
-  @translation.should == {"foo"=> {"bar" => "c|d|e"}}
+  @translation.should == {"foo"=>{"bar"=>{"cuk"=>"c|d|e"}}}
 end 

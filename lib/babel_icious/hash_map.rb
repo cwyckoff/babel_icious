@@ -14,7 +14,7 @@ module Babelicious
       
     end
 
-    def initialize(path_translator, opts)
+    def initialize(path_translator, opts={})
       @path_translator, @opts = path_translator, opts
     end
     
