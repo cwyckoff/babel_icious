@@ -8,7 +8,7 @@ module Babelicious
         eval("Babelicious::#{direction[:from].to_s.capitalize}Map").new(PathTranslator.new(opts[:from]), opts)
       end
 
-      def target(direction, opts={})
+      def target(direction, opts={}, &block)
         eval("Babelicious::#{direction[:to].to_s.capitalize}Map").new(PathTranslator.new(opts[:to]), opts)
       end
 

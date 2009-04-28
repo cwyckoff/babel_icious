@@ -2,7 +2,7 @@ require 'xml'
 
 module Babelicious
   
-  class XmlMap
+  class XmlMap < BaseMap
     
     class << self
       
@@ -27,7 +27,9 @@ module Babelicious
       end
     end
 
-    def map_from(xml_output, source_value)
+    private
+    
+    def map_output(xml_output, source_value)
       @index = @path_translator.last_index
 
       set_root(xml_output)
@@ -37,8 +39,6 @@ module Babelicious
         map_from(xml_output, source_value)
       end 
     end
-    
-    private
     
     def populate_nodes(xml_output)
       return if @index == 0
@@ -115,7 +115,7 @@ module Babelicious
 
       end
     end
-    
+
     class ChildNodeMapper
 
       class << self

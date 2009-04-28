@@ -20,6 +20,7 @@ module Babelicious
       
       def map(opts={})
         current_target_mapper.register_mapping(opts)
+        self
       end
 
       def mappings
@@ -34,6 +35,14 @@ module Babelicious
         raise MapperError, "No target mapper exists for key #{key}" unless mappings.has_key?(key)
         
         mappings[key].translate(source)
+      end
+      
+      def when(&block)
+        current_target_mapper.register_condition(:when, nil, &block)
+      end
+
+      def unless(condition)
+        current_target_mapper.register_condition(:unless, condition)
       end
       
       private

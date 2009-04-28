@@ -161,6 +161,7 @@ module Babelicious
   end 
   
   module XmlMappingStrategies
+
     
     describe Concatenate do
 

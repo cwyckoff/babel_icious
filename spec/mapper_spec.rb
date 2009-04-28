@@ -38,17 +38,30 @@ module Babelicious
       end
       
     end
+
+    describe ".direction" do 
+      
+      it "should set direction of the mapping" do 
+        # expect
+        @target_mapper.should_receive(:direction=).with({:from => :xml, :to => :hash})
+
+        # given
+        Mapper.reset
+        Mapper.config(:foo) do |m|
+          m.direction = {:from => :xml, :to => :hash}
+        end
+      end
+      
+    end
     
     describe ".map" do 
       
       before(:each) do
         Mapper.reset
         @opts = {:to => "bar/foo", :from => "foo/bar"}
-
-        
         Mapper.config(:foo) { |m| m.direction = {:from => :xml, :to => :hash}}
       end
-
+      
       it "should register mappings" do 
         # expect
         @target_mapper.should_receive(:register_mapping).with(@opts)
@@ -59,6 +72,25 @@ module Babelicious
       
     end
 
+    describe ".reset" do 
+      
+      it "should reset direction" do 
+        # when
+        Mapper.reset
+        
+        # expect
+        Mapper.direction.should be_nil
+      end
+
+      it "should reset mappings" do 
+        # when
+        Mapper.reset
+        
+        # expect
+        Mapper.mappings.should == {}
+      end
+    end
+    
     describe ".translate" do 
 
       before(:each) do
@@ -86,42 +118,43 @@ module Babelicious
       end
       
     end
-    
-    describe ".direction" do 
-      
-      it "should set direction of the mapping" do 
-        # expect
-        @target_mapper.should_receive(:direction=).with({:from => :xml, :to => :hash})
 
-        # given
-        Mapper.config(:foo) do |m|
-          m.direction = {:from => :xml, :to => :hash}
+    
+    describe "mapping conditions" do 
+
+      before(:each) do
+        Mapper.reset
+        @opts = {:to => "bar/foo", :from => "foo/bar"}
+        Mapper.config(:foo) { |m| m.direction = {:from => :xml, :to => :hash}}
+      end
+      
+      describe ".when" do 
+
+        it "should delegate it to target mapper" do 
+          # expect
+          @target_mapper.should_receive(:register_condition) #.with(:when, an_instance_of(Proc)).and_return(@when_conditions)
+          
+          # given
+          Mapper.map(@opts).when do |value|
+            value =~ /baz/
+          end
         end
-      end
-      
-      
-    end
-    
-    
-    describe ".reset" do 
-      
-      it "should reset direction" do 
-        # when
-        Mapper.reset
         
-        # expect
-        Mapper.direction.should be_nil
       end
 
-      it "should reset mappings" do 
-        # when
-        Mapper.reset
-        
-        # expect
-        Mapper.mappings.should == {}
-      end
-    end
+      describe ".unless" do 
 
+        it "should delegate it to target mapper" do 
+          # expect
+          @target_mapper.should_receive(:register_condition).with(:unless, :nil) #.with(:when, an_instance_of(Proc)).and_return(@when_conditions)
+          
+          # given
+          Mapper.map(@opts).unless(:nil)
+        end
+        
+      end
+      
+    end
   end
   
 end

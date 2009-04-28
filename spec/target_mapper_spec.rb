@@ -15,27 +15,15 @@ module Babelicious
       @target_mapper.register_mapping(@opts)
     end
     
-    describe "#translate" do 
-
-      before(:each) do 
-        @xml = '<foo>bar</foo>'
-        @source_element.stub!(:class).and_return(@xml_map_klass = mock("XmlMapKlass", :filter_source => @xml))
-      end
+    
+    describe "#register_condition" do 
       
-      def do_process
-        @target_mapper.translate('<foo>bar</foo>')
-      end
-      
-      it "should map target to elements for mapping" do 
-        during_process { 
-          @target_element.should_receive(:map_from).and_return({})
-        }
-      end
-      
-      it "should delegate the source to the source element for filtering" do 
-        during_process { 
-          @xml_map_klass.should_receive(:filter_source).with(@xml).once
-        }
+      it "should delegate to target map" do 
+        # expect
+        @target_element.should_receive(:register_condition).with(:unless, :nil)
+        
+        # given
+        @target_mapper.register_condition(:unless, :nil)
       end
       
     end
@@ -110,6 +98,31 @@ module Babelicious
       end
     end
     
+    describe "#translate" do 
+
+      before(:each) do 
+        @xml = '<foo>bar</foo>'
+        @source_element.stub!(:class).and_return(@xml_map_klass = mock("XmlMapKlass", :filter_source => @xml))
+      end
+      
+      def do_process
+        @target_mapper.translate('<foo>bar</foo>')
+      end
+      
+      it "should map target to elements for mapping" do 
+        during_process { 
+          @target_element.should_receive(:map_from).and_return({})
+        }
+      end
+      
+      it "should delegate the source to the source element for filtering" do 
+        during_process { 
+          @xml_map_klass.should_receive(:filter_source).with(@xml).once
+        }
+      end
+      
+    end
+  
   end
 
 end

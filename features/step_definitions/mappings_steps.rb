@@ -24,14 +24,6 @@ Given /^a mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |source, targ
   end
 end
 
-Given /^a mapping exists with concatenation$/ do
-  Babelicious::Mapper.config(:concatenation) do |m|
-    m.direction = {:from => :xml, :to => :hash}
-
-    m.map :from => "foo/cuk", :to => "foo/bar", :concatenate => "|"
-  end
-end
-
 Given /^a mapping exists with identical nested nodes$/ do 
   @direction = {:from => :xml, :to => :hash}
   @tag = :baz
@@ -45,6 +37,39 @@ Given /^a mapping exists with identical nested nodes$/ do
   end
 end
 
+Given /^a mapping exists with '(.*)' condition$/ do |condition|
+  case condition
+  when /unless/
+    Babelicious::Mapper.config(:ignore) do |m|
+      m.direction = {:from => :xml, :to => :hash}
+
+      m.map :from => "foo/bar", :to => "bar/foo"
+      m.map(:from => "foo/baz", :to => "bar/boo").unless(:empty)
+    end
+  when /when/
+    Babelicious::Mapper.config(:when) do |m|
+      m.direction = {:from => :xml, :to => :hash}
+
+      m.map(:from => "foo/bar", :to => "bar/foo").when do |value|
+        value =~ /hubba/
+      end 
+      m.map(:from => "foo/baz", :to => "bar/boo").when do |value|
+        value =~ /bubba/
+      end 
+    end
+  when /concatenate/
+    Babelicious::Mapper.config(:concatenation) do |m|
+      m.direction = {:from => :xml, :to => :hash}
+
+      m.map :from => "foo/cuk", :to => "foo/bar", :concatenate => "|"
+    end
+  end
+end
+
+
+#
+##
+###
 When /^the mapping is translated$/ do
   case @direction
   when {:from => :xml, :to => :hash}
@@ -61,11 +86,24 @@ When /^the mapping with nested nodes is translated$/ do
   @translation = Babelicious::Mapper.translate(@tag.to_sym, xml)
 end
 
-When /^the concatenated mapping is translated$/ do
-  xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo>c</coo><coo>d</coo><coo>e</coo></cuk></foo>' 
-  @translation = Babelicious::Mapper.translate(:concatenation, xml)
+When /^the '(.*)' mapping is translated$/ do |condition|
+  case condition
+  when /unless/
+    xml = '<foo><bar>a</bar><baz></baz></foo>'
+    @translation = Babelicious::Mapper.translate(:ignore, xml)
+  when /when/
+    xml = '<foo><bar>cuk</bar><baz>hubbabubba</baz></foo>'
+    @translation = Babelicious::Mapper.translate(:when, xml)
+  when /concatenate/
+    xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo>c</coo><coo>d</coo><coo>e</coo></cuk></foo>' 
+    @translation = Babelicious::Mapper.translate(:concatenation, xml)
+  end
 end
 
+
+#
+##
+###
 Then /^the xml should be correctly mapped$/ do
   case @direction
   when {:from => :xml, :to => :hash}
@@ -79,6 +117,13 @@ Then /^the xml should properly transform nested nodes$/ do
   @translation.should == {"foo"=>{"cuk" => {"coo" => [{"id" => "c"}, {"id" => "d"}]}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
 end 
 
-Then /^the xml should properly concatenate node content$/ do
-  @translation.should == {"foo"=>{"bar"=>{"cuk"=>"c|d|e"}}}
-end 
+Then /^the target should be correctly processed for condition '(.*)'$/ do |condition|
+  case condition
+  when /unless/
+    @translation.should == {"bar" => {"foo" => "a"}}
+  when /when/
+    @translation.should == {"bar" => {"boo" => "hubbabubba"}}
+  when /concatenate/
+    @translation.should == {"foo"=>{"bar"=>{"cuk"=>"c|d|e"}}}
+  end 
+end

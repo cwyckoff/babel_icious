@@ -47,7 +47,20 @@ the slash indicates that "bar" is a nested hash within "foo".  The target xml th
 with the value of "bar" from the hash above placed in the nested <foo> tags in the xml.
 
 
-When you want to translate the mappings, simply call:
+You can also qualify your mappings with the methods "unless" and "when".  For example, if you do not want to translate mappings that lack a value, simply add an "unless" method:
+
+  m.map(:from => "foo/bar", :to => "bar/foo").unless(:empty)
+
+if the value at "foo/bar" is empty or nil, "foo/bar" will not be translated.  Additionally, if your qualification is more complicated than a simple empty? or nil?, use the "when" method, which takes a block.  The mapping:
+
+  m.map(:from => "foo/bar", :to => "bar/foo").when do |value|
+    value =~ /^M/
+  end
+
+will only translate if the value at "foo/bar" begins with a capital "M".
+
+
+Finally, when you want to translate the mappings, simply call:
 
  Babelicious::Mapper.translate(:foo, source)
 
