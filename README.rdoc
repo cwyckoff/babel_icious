@@ -47,6 +47,8 @@ the slash indicates that "bar" is a nested hash within "foo".  The target xml th
 with the value of "bar" from the hash above placed in the nested <foo> tags in the xml.
 
 
+=== Conditions
+
 You can also qualify your mappings with the methods "unless" and "when".  For example, if you do not want to translate mappings that lack a value, simply add an "unless" method:
 
   m.map(:from => "foo/bar", :to => "bar/foo").unless(:empty)
@@ -59,6 +61,8 @@ if the value at "foo/bar" is empty or nil, "foo/bar" will not be translated.  Ad
 
 will only translate if the value at "foo/bar" begins with a capital "M".
 
+
+=== Translation
 
 Finally, when you want to translate the mappings, simply call:
 
