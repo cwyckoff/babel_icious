@@ -57,12 +57,14 @@ Given /^a mapping exists with '(.*)' condition$/ do |condition|
         value =~ /bubba/
       end 
     end
-  when /concatenate/
-    Babelicious::Mapper.config(:concatenation) do |m|
-      m.direction = {:from => :xml, :to => :hash}
+  end
+end
 
-      m.map :from => "foo/cuk", :to => "foo/bar", :concatenate => "|"
-    end
+Given /^a mapping exists with concatenation$/ do
+  Babelicious::Mapper.config(:concatenation) do |m|
+    m.direction = {:from => :xml, :to => :hash}
+
+    m.map :from => "foo/cuk", :to => "foo/bar", :concatenate => "|"
   end
 end
 
@@ -94,10 +96,12 @@ When /^the '(.*)' mapping is translated$/ do |condition|
   when /when/
     xml = '<foo><bar>cuk</bar><baz>hubbabubba</baz></foo>'
     @translation = Babelicious::Mapper.translate(:when, xml)
-  when /concatenate/
-    xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo>c</coo><coo>d</coo><coo>e</coo></cuk></foo>' 
-    @translation = Babelicious::Mapper.translate(:concatenation, xml)
   end
+end
+
+When /^the mapping with concatenation is translated$/ do
+  xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo>c</coo><coo>d</coo><coo>e</coo></cuk></foo>' 
+  @translation = Babelicious::Mapper.translate(:concatenation, xml)
 end
 
 
@@ -123,7 +127,9 @@ Then /^the target should be correctly processed for condition '(.*)'$/ do |condi
     @translation.should == {"bar" => {"foo" => "a"}}
   when /when/
     @translation.should == {"bar" => {"boo" => "hubbabubba"}}
-  when /concatenate/
-    @translation.should == {"foo"=>{"bar"=>{"cuk"=>"c|d|e"}}}
   end 
+end
+
+Then /^the target should be properly concatenated$/ do
+  @translation.should == {"foo"=>{"bar"=>"c|d|e"}}
 end

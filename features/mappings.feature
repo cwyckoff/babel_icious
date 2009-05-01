@@ -15,6 +15,11 @@ Scenario: Mapping from xml with multiple nested nodes with same name
   When the mapping with nested nodes is translated
   Then the xml should properly transform nested nodes
 
+Scenario: Mapping from xml with concatenation
+  Given a mapping exists with concatenation
+  When the mapping with concatenation is translated
+  Then the target should be properly concatenated
+
 Scenario Outline: Mapping with conditions
   Given a mapping exists with '<Condition>' condition
   When the '<Condition>' mapping is translated
@@ -24,5 +29,4 @@ Scenario Outline: Mapping with conditions
   | Condition	|
   | unless	|
   | when	|
-  | concatenate	|
 

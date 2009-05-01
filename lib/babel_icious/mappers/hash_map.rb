@@ -37,11 +37,49 @@ module Babelicious
           if(hsh[element])
             hsh[element]
           else
-            hsh[element] = (index == @path_translator.last_index ? source_value : {})
+            hsh[element] = (index == @path_translator.last_index ? map_source_value(source_value) : {})
           end 
         end
       end 
     end 
     
+    def map_source_value(source_value)
+      if(@opts[:concatenate])
+        HashMappingStrategies::Concatenate.map(source_value, @opts[:concatenate])
+      else 
+        source_value
+      end 
+    end
+  end
+  
+  module HashMappingStrategies
+
+    class Concatenate
+
+      class << self
+        
+        def map(source_value, concat)
+          if(source_value.kind_of?(Hash))
+            concat_values_from_hash(source_value).join(concat)
+          elsif(source_value.kind_of?(Array)) 
+            source_value.join(concat)
+          else 
+            source_value
+          end 
+        end
+
+        private
+        
+        def concat_values_from_hash(source_value)
+          source_value.each do |key, value|
+            unless value.is_a?(Array)
+              return concat_values_from_hash(value)
+            else 
+              return value
+            end
+          end
+        end
+      end
+    end
   end
 end

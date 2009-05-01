@@ -21,6 +21,10 @@ module Babelicious
       @parsed_path.size - 1
     end
     
+    def last
+      @parsed_path.last
+    end
+    
     def size
       @parsed_path.size
     end

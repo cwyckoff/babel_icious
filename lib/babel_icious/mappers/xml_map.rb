@@ -18,7 +18,7 @@ module Babelicious
     
     def initialize(path_translator, opts={})
       @path_translator, @opts = path_translator, opts
-      @xml_value_mapper = XmlValueMapper.new(@opts)
+      @xml_value_mapper = XmlValueMapper.new(@path_translator, @opts)
     end
     
     def value_from(source)
@@ -76,15 +76,16 @@ module Babelicious
 
   
   class XmlValueMapper
-    
-    def initialize(opts={})
-      @opts = opts
+
+    def initialize(path_translator, opts={})
+      @path_translator, @opts = path_translator, opts
     end
     
     def map(node)
       if(node.children.size > 1)
         content = {}
-        return map_with_strategies_for_children(node, content)
+         XmlMappingStrategies::ChildNodeMapper.map(node, content)
+#        return map_with_strategies_for_children(node, content)
       else
         return node.content
       end
@@ -92,13 +93,13 @@ module Babelicious
 
     private
     
-    def map_with_strategies_for_children(node, content)
-      if @opts[:concatenate]
-        XmlMappingStrategies::Concatenate.map(node, @opts[:concatenate])
-      else 
-        XmlMappingStrategies::ChildNodeMapper.map(node, content)
-      end
-    end
+#     def map_with_strategies_for_children(node, content)
+#       if @opts[:concatenate]
+#         XmlMappingStrategies::Concatenate.map(node, @opts[:concatenate], @path_translator.last)
+#       else 
+#         XmlMappingStrategies::ChildNodeMapper.map(node, content)
+#       end
+#     end
   end
   
   
@@ -108,9 +109,9 @@ module Babelicious
       
       class << self
         
-        def map(node, concat_value)
+        def map(node, concat_value, key)
           concatenated_children = node.children.inject('') {|a,b| a << "#{b.content}#{concat_value}"}
-          {node.name => concatenated_children.chop}
+          {key => concatenated_children.chop}
         end
 
       end

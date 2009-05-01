@@ -25,6 +25,13 @@ module Babelicious
       
     end
 
+    describe "#last" do 
+      
+      it "should return last element in path" do 
+        @translator.last.should == "foo"
+      end
+    end
+    
     describe "#last_index" do 
       
       it "should return index of last element in parsed path array" do 
