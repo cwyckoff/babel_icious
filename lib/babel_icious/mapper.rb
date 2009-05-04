@@ -54,8 +54,8 @@ module Babelicious
       def mapping_already_exists?(key)
         mappings.keys.include?(key)
       end
+
     end
-    
   end
 
 end

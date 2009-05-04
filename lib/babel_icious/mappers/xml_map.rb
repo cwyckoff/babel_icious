@@ -122,7 +122,7 @@ module Babelicious
       class << self
 
         def map(node, content)
-          node.children.each do |child|
+          node.each_element do |child|
             if(content[child.name])
               update_content_key(content, child)
             else
@@ -147,11 +147,11 @@ module Babelicious
         end
         
         def grandchild_is_final_node(child)
-          !child.children? || child.child.name == "text"        
+          !child.children? || child.child.name == "text"
         end
         
         def set_grandchild_value_in_array(content, child)
-          content[child.name] = [] unless content_value_is_array?(content, child) 
+          content[child.name] = [] unless content_value_is_array?(content, child)
           if(child.children?)
             content[child.name] << child.child.content
           else
