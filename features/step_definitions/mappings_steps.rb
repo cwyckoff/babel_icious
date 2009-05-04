@@ -24,7 +24,8 @@ Given /^a mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |source, targ
   end
 end
 
-Given /^a mapping exists with identical nested nodes$/ do 
+Given /^a mapping exists with nested nodes$/ do 
+  Babelicious::Mapper.reset
   @direction = {:from => :xml, :to => :hash}
   @tag = :baz
 
@@ -84,6 +85,16 @@ When /^the mapping is translated$/ do
 end
 
 When /^the mapping with nested nodes is translated$/ do 
+  xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo><id>c</id></coo><boo>d</boo></cuk></foo>' 
+  @translation = Babelicious::Mapper.translate(@tag.to_sym, xml)
+end
+
+When /^the mapping with partially empty nested nodes is translated$/ do 
+  xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo><id>c</id></coo><boo></boo></cuk></foo>' 
+  @translation = Babelicious::Mapper.translate(@tag.to_sym, xml)
+end
+
+When /^the mapping with identical nested nodes is translated$/ do 
   xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo><id>c</id></coo><coo><id>d</id></coo></cuk></foo>' 
   @translation = Babelicious::Mapper.translate(@tag.to_sym, xml)
 end
@@ -118,6 +129,14 @@ Then /^the xml should be correctly mapped$/ do
 end
 
 Then /^the xml should properly transform nested nodes$/ do
+  @translation.should == {"foo"=>{"cuk" => {"boo" => ["d"], "coo" => {"id" => "c"}}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
+end 
+
+Then /^the xml should properly transform partially empty nested nodes$/ do
+  @translation.should == {"foo"=>{"cuk" => {"boo" => "", "coo" => {"id" => "c"}}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
+end 
+
+Then /^the xml should properly transform identical nested nodes$/ do
   @translation.should == {"foo"=>{"cuk" => {"coo" => [{"id" => "c"}, {"id" => "d"}]}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
 end 
 

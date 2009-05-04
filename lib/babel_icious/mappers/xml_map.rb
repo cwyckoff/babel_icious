@@ -147,12 +147,16 @@ module Babelicious
         end
         
         def grandchild_is_final_node(child)
-          child.child.name == "text"        
+          !child.children? || child.child.name == "text"        
         end
         
         def set_grandchild_value_in_array(content, child)
           content[child.name] = [] unless content_value_is_array?(content, child) 
-          content[child.name] << child.child.content
+          if(child.children?)
+            content[child.name] << child.child.content
+          else
+            content[child.name] = ""
+          end 
         end
 
         def update_content_key(content, child)
