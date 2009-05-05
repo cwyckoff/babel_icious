@@ -14,8 +14,8 @@ module Babelicious
         yield self
       end
 
-      def direction=(dir={})
-        current_target_mapper.direction = dir
+      def direction(dir={})
+        current_target_mapper.direction = @direction = dir
       end
       
       def map(opts={})
@@ -28,7 +28,7 @@ module Babelicious
       end
       
       def reset
-        @mapped_targets, @direction = nil, nil
+        @mapped_targets, @direction = nil, {}
       end
 
       def translate(key=nil, source=nil)

@@ -30,7 +30,7 @@ module Babelicious
         
         it "should raise an error" do 
           # given
-          Mapper.config(:bar) { |m| m.direction = {:from => :xml, :to => :hash }}
+          Mapper.config(:bar) { |m| m.direction :from => :xml, :to => :hash }
           
           # expect
           running { Mapper.config(:bar) {} }.should raise_error(MapperError)
@@ -48,7 +48,7 @@ module Babelicious
         # given
         Mapper.reset
         Mapper.config(:foo) do |m|
-          m.direction = {:from => :xml, :to => :hash}
+          m.direction :from => :xml, :to => :hash
         end
       end
       
@@ -59,7 +59,7 @@ module Babelicious
       before(:each) do
         Mapper.reset
         @opts = {:to => "bar/foo", :from => "foo/bar"}
-        Mapper.config(:foo) { |m| m.direction = {:from => :xml, :to => :hash}}
+        Mapper.config(:foo) { |m| m.direction :from => :xml, :to => :hash}
       end
       
       it "should register mappings" do 
@@ -79,7 +79,7 @@ module Babelicious
         Mapper.reset
         
         # expect
-        Mapper.direction.should be_nil
+        Mapper.direction.should == {}
       end
 
       it "should reset mappings" do 
@@ -97,7 +97,7 @@ module Babelicious
         @xml = '<foo><bar>baz</baz></foo>'
         Mapper.reset
         Mapper.config(:foo) do |m| 
-          m.direction = {:from => :xml, :to => :hash}
+          m.direction :from => :xml, :to => :hash
           m.map :from => "foo/bar", :to => "bar/foo"
         end
       end
@@ -125,7 +125,7 @@ module Babelicious
       before(:each) do
         Mapper.reset
         @opts = {:to => "bar/foo", :from => "foo/bar"}
-        Mapper.config(:foo) { |m| m.direction = {:from => :xml, :to => :hash}}
+        Mapper.config(:foo) { |m| m.direction :from => :xml, :to => :hash}
       end
       
       describe ".when" do 

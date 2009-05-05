@@ -5,7 +5,7 @@ Given /^a mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |source, targ
   case @direction
   when {:from => :xml, :to => :hash}
     Babelicious::Mapper.config(@tag.to_sym) do |m|
-      m.direction = {:from => :xml, :to => :hash}
+      m.direction :from => :xml, :to => :hash
 
       m.map :from => "foo/bar", :to => "bar/foo"
       m.map :from => "foo/baz", :to => "bar/boo"
@@ -14,7 +14,7 @@ Given /^a mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |source, targ
     end
   when {:from => :hash, :to => :xml}
     Babelicious::Mapper.config(@tag.to_sym) do |m|
-      m.direction = {:from => :hash, :to => :xml}
+      m.direction :from => :hash, :to => :xml
 
       m.map :from => "foo/bar", :to => "bar/foo"
       m.map :from => "foo/baz", :to => "bar/boo"
@@ -23,7 +23,7 @@ Given /^a mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |source, targ
     end
   when {:from => :hash, :to => :hash}
     Babelicious::Mapper.config(@tag.to_sym) do |m|
-      m.direction = {:from => :hash, :to => :hash}
+      m.direction :from => :hash, :to => :hash
 
       m.map :from => "foo", :to => "zoo"
       m.map :from => "bar", :to => "yoo"
@@ -39,7 +39,7 @@ Given /^a mapping exists with nested nodes$/ do
   @tag = :baz
 
   Babelicious::Mapper.config(@tag) do |m|
-    m.direction = @direction
+    m.direction(@direction)
 
     m.map :from => "foo/bar", :to => "bar/foo"
     m.map :from => "foo/baz", :to => "bar/boo"
@@ -51,14 +51,14 @@ Given /^a mapping exists with '(.*)' condition$/ do |condition|
   case condition
   when /unless/
     Babelicious::Mapper.config(:ignore) do |m|
-      m.direction = {:from => :xml, :to => :hash}
+      m.direction :from => :xml, :to => :hash
 
       m.map :from => "foo/bar", :to => "bar/foo"
       m.map(:from => "foo/baz", :to => "bar/boo").unless(:empty)
     end
   when /when/
     Babelicious::Mapper.config(:when) do |m|
-      m.direction = {:from => :xml, :to => :hash}
+      m.direction :from => :xml, :to => :hash
 
       m.map(:from => "foo/bar", :to => "bar/foo").when do |value|
         value =~ /hubba/
@@ -72,7 +72,7 @@ end
 
 Given /^a mapping exists with concatenation$/ do
   Babelicious::Mapper.config(:concatenation) do |m|
-    m.direction = {:from => :xml, :to => :hash}
+    m.direction :from => :xml, :to => :hash
 
     m.map :from => "foo/cuk", :to => "foo/bar", :concatenate => "|"
   end
