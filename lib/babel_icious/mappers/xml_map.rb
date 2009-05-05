@@ -18,12 +18,11 @@ module Babelicious
     
     def initialize(path_translator, opts={})
       @path_translator, @opts = path_translator, opts
-      @xml_value_mapper = XmlValueMapper.new(@path_translator, @opts)
     end
     
     def value_from(source)
       source.find("/#{@path_translator.full_path}").each do |node|
-        return @xml_value_mapper.map(node)
+        return xml_value_mapper.map(node)
       end
     end
 
@@ -72,6 +71,10 @@ module Babelicious
       end 
       false
     end
+    
+    def xml_value_mapper
+      @xml_value_mapper ||= XmlValueMapper.new(@path_translator, @opts)
+    end
   end
 
   
@@ -118,13 +121,13 @@ module Babelicious
     end
     
     def final_node?(child)
-      !child.children? || child.child.name == "text"
+      !child.children? || !child.child.children?
     end
     
     def set_value_in_array(content, child)
       content[child.name] = [] unless content_value_is_array?(content, child)
       if(child.children?)
-        if (child.parent.find(child.name)).to_a.size == 1
+        if((child.parent.find(child.name)).to_a.size == 1)
           content[child.name] = child.child.content
         else 
           content[child.name] << child.child.content

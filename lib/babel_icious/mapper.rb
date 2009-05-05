@@ -27,6 +27,10 @@ module Babelicious
         @mapped_targets ||= {}
       end
       
+#       def merge(from={})
+#         current_target_mapper.register_merge(from)
+#       end
+      
       def reset
         @mapped_targets, @direction = nil, {}
       end
@@ -41,8 +45,8 @@ module Babelicious
         current_target_mapper.register_condition(:when, nil, &block)
       end
 
-      def unless(condition)
-        current_target_mapper.register_condition(:unless, condition)
+      def unless(condition=nil, &block)
+        current_target_mapper.register_condition(:unless, condition, &block)
       end
       
       private

@@ -78,6 +78,14 @@ Given /^a mapping exists with concatenation$/ do
   end
 end
 
+Given /^a mapping exists with a merge$/ do
+  Babelicious::Mapper.config(:merge) do |m|
+    m.direction :from => :xml, :to => :hash
+
+    m.map(:from => "foo/bar", :to => "bar/foo").merge("foo/baz")
+  end
+end
+
 
 #
 ##
@@ -129,6 +137,10 @@ When /^the mapping with concatenation is translated$/ do
   @translation = Babelicious::Mapper.translate(:concatenation, xml)
 end
 
+When /^the merged mapping is translated$/ do
+  pending
+end
+
 
 #
 ##
@@ -168,4 +180,8 @@ end
 
 Then /^the target should be properly concatenated$/ do
   @translation.should == {"foo"=>{"bar"=>"c|d|e"}}
+end
+
+Then /^the merged target should be correctly processed$/ do
+  pending
 end

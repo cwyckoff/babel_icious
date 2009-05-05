@@ -21,6 +21,11 @@ Scenario Outline: Mapping with conditions
   | unless	|
   | when	|
 
+# Scenario: Mapping hash with merge
+#   Given a mapping exists with a merge
+#   When the merged mapping is translated
+#   Then the merged target should be correctly processed 
+
 Scenario Outline: Mapping from xml with multiple nested nodes
   Given a mapping exists with nested nodes
   When the mapping with '<NodeType>' nested nodes is translated
