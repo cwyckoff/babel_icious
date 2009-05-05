@@ -43,7 +43,6 @@ module Babelicious
     def reset
       @mappings, @direction = [], nil
     end
-
   end
 end
 

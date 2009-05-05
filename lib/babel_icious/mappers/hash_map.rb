@@ -19,12 +19,10 @@ module Babelicious
     
     def value_from(source)
       hash = {}
-      source = symbolize_keys(source)
-
       @path_translator.inject_with_index(hash) do |hsh, element, index|
-#        return hsh[element.to_sym] if (index == @path_translator.last_index)
+        return hsh[element.to_sym] if (index == @path_translator.last_index && index != 0)
         if hsh.empty?
-          source[element.to_sym]
+          source_element(source, element)
         else 
           hsh[element.to_sym]
         end
@@ -32,6 +30,10 @@ module Babelicious
     end
 
     private
+    
+    def source_element(source, element)
+      source[element.to_sym] || source[element.to_s]
+    end
 
     def map_output(hash_output, source_value)
       catch :no_value do
@@ -53,14 +55,6 @@ module Babelicious
       end 
     end
 
-    # from http://www.geekmade.co.uk/2008/09/ruby-tip-normalizing-hash-keys-as-symbols/
-    #
-    def symbolize_keys(hash)
-      hash.inject({}) do |options, (key, value)|
-        options[(key.to_sym rescue key) || key] = value
-        options
-      end
-    end
   end
   
   module HashMappingStrategies

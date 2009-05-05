@@ -84,8 +84,7 @@ module Babelicious
     def map(node)
       if(node.children.size > 1)
         content = {}
-         XmlMappingStrategies::ChildNodeMapper.map(node, content)
-#        return map_with_strategies_for_children(node, content)
+         map_child(node, content)
       else
         return node.content
       end
@@ -93,82 +92,56 @@ module Babelicious
 
     private
     
-#     def map_with_strategies_for_children(node, content)
-#       if @opts[:concatenate]
-#         XmlMappingStrategies::Concatenate.map(node, @opts[:concatenate], @path_translator.last)
-#       else 
-#         XmlMappingStrategies::ChildNodeMapper.map(node, content)
-#       end
-#     end
-  end
-  
-  
-  module XmlMappingStrategies
-
-    class Concatenate
-      
-      class << self
-        
-        def map(node, concat_value, key)
-          concatenated_children = node.children.inject('') {|a,b| a << "#{b.content}#{concat_value}"}
-          {key => concatenated_children.chop}
-        end
-
-      end
-    end
-
-    class ChildNodeMapper
-
-      class << self
-
-        def map(node, content)
-          node.each_element do |child|
-            if(content[child.name])
-              update_content_key(content, child)
-            else
-              create_content_key(content, child)
-            end 
-          end
-          {node.name => content}
-        end
-        
-        private
-        
-        def content_value_is_array?(content, child) 
-          content[child.name].is_a?(Array)
+    def map_child(node, content)
+      node.each_element do |child|
+        if(content[child.name])
+          update_content_key(content, child)
+        else
+          create_content_key(content, child)
         end 
-        
-        def create_content_key(content, child)
-          unless grandchild_is_final_node(child)
-            content[child.name] = {child.child.name => child.child.content}
-          else 
-            set_grandchild_value_in_array(content, child)
-          end
-        end
-        
-        def grandchild_is_final_node(child)
-          !child.children? || child.child.name == "text"
-        end
-        
-        def set_grandchild_value_in_array(content, child)
-          content[child.name] = [] unless content_value_is_array?(content, child)
-          if(child.children?)
-            content[child.name] << child.child.content
-          else
-            content[child.name] = ""
-          end 
-        end
-
-        def update_content_key(content, child)
-          unless grandchild_is_final_node(child)
-            content[child.name] = [content[child.name]] unless content_value_is_array?(content, child) 
-            content[child.name] << {child.child.name => child.child.content}
-          else 
-            set_grandchild_value_in_array(content, child)
-          end
-        end
+      end
+      {node.name => content}
+    end
+    
+    private
+    
+    def content_value_is_array?(content, child) 
+      content[child.name].is_a?(Array)
+    end 
+    
+    def create_content_key(content, child)
+      unless final_node?(child)
+        content[child.name] = {child.child.name => child.child.content}
+      else 
+        set_value_in_array(content, child)
       end
     end
     
+    def final_node?(child)
+      !child.children? || child.child.name == "text"
+    end
+    
+    def set_value_in_array(content, child)
+      content[child.name] = [] unless content_value_is_array?(content, child)
+      if(child.children?)
+        if (child.parent.find(child.name)).to_a.size == 1
+          content[child.name] = child.child.content
+        else 
+          content[child.name] << child.child.content
+        end
+      else
+        content[child.name] = ""
+      end 
+    end
+
+    def update_content_key(content, child)
+      unless final_node?(child)
+        content[child.name] = [content[child.name]] unless content_value_is_array?(content, child) 
+        content[child.name] << {child.child.name => child.child.content}
+      else 
+        set_value_in_array(content, child)
+      end
+    end
   end
+
 end

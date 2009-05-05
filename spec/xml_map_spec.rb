@@ -130,24 +130,12 @@ module Babelicious
           @source = mock("XML::Document", :find => [@node])
         end
         
-#         describe "concatenating" do 
-          
-#           it "should delegate to Concatenate" do 
-#             # expect
-#             XmlMappingStrategies::Concatenate.should_receive(:map).with(@node, "|", "bar").and_return({'bar' => "foo|bar|baz"})
-            
-#             # given
-#             xml_value_mapper = XmlValueMapper.new(@path_translator, opts = {:concatenate => "|"})
-#             xml_value_mapper.map(@node)
-#           end
-
-#         end
-
         describe "when node has children and no options are set" do
           
           it "should map child nodes" do
+            pending
             # expect
-            XmlMappingStrategies::ChildNodeMapper.should_receive(:map).with(@node, {}).and_return({'institutions' => {'institution' => ['foo', 'bar', 'baz'] }})
+            XmlSourceMappingStrategies::ChildNodeMapper.should_receive(:map).with(@node, {}).and_return({'institutions' => {'institution' => ['foo', 'bar', 'baz'] }})
             
             # given
             xml_value_mapper = XmlValueMapper.new({})
@@ -157,49 +145,6 @@ module Babelicious
         
       end
 
-    end 
-  end 
-  
-  module XmlMappingStrategies
-
-    
-    describe Concatenate do
-
-      before(:each) do 
-        @node1 = mock("XML::Node", :name => "institution", :content => "foo")
-        @node2 = mock("XML::Node", :name => "institution", :content => "bar")
-        @node3 = mock("XML::Node", :name => "institution", :content => "baz")
-        @node = mock("XML::Node", :name => "institutions", :children => [@node1, @node2, @node3])
-      end
-      
-      it "should build concatenation string" do 
-        # expect
-        @node.children.should_receive(:inject).and_return("foo|bar|baz|")
-        
-        # given
-        Concatenate.map(@node, "|", "foobar")
-      end
-
-      it "should chop trailing concatenation element from string" do 
-        # given
-        concat_str = "foo|bar|baz|"
-        @node.children.stub!(:inject).and_return(concat_str)
-        
-        # expect
-        concat_str.should_receive(:chop).and_return("foo|bar|baz")
-        
-        # when
-        Concatenate.map(@node, "|", "foobar")
-      end
-      
-      it "should concatenate values from similarly named nodes" do 
-        Concatenate.map(@node, "|", "foobar").should == {'foobar' => "foo|bar|baz"}
-      end
-
-      it "should set last element of path_translator as key to concatenation hash" do 
-        Concatenate.map(@node, "|", "foobar").keys.first.should == 'foobar'
-      end
-      
     end 
     
   end

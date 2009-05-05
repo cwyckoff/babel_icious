@@ -25,10 +25,10 @@ Given /^a mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |source, targ
     Babelicious::Mapper.config(@tag.to_sym) do |m|
       m.direction = {:from => :hash, :to => :hash}
 
-      m.map :from => "foo/bar", :to => "bar/foo"
-      m.map :from => "foo/baz", :to => "bar/boo"
-      m.map :from => "foo/cuk/coo", :to => "foo/bar/coo"
-      m.map :from => "foo/cuk/doo", :to => "doo"
+      m.map :from => "foo", :to => "zoo"
+      m.map :from => "bar", :to => "yoo"
+      m.map :from => "baz", :to => "too"
+      m.map :from => "boo", :to => "soo/roo"
     end
   end
 end
@@ -91,8 +91,7 @@ When /^the mapping is translated$/ do
     source = {:foo => {:bar => "a", :baz => "b", :cuk => {:coo => "c", :doo => "d"}}}
     @translation = Babelicious::Mapper.translate(@tag.to_sym, source)
   when {:from => :hash, :to => :hash}
-#    source = {"prefix"=>"Mr.", "city"=>"South Jordan", "address1"=>"10701 River Front Pkwy", "zip"=>"84095", "provider_id"=>"8493", "education_level"=>"4", "return_url"=>"http://www.google.com/", "country"=>"US", "action"=>"create", "controller"=>"referrals", "phone1"=>"8017650987", "first_name"=>"Test", "last_name"=>"Test", "state"=>"UT", "email"=>"T_05_04_160503@bogus_Test.com"}
-    source = {:foo => {:bar => "a", :baz => "b", :cuk => {:coo => "c", :doo => "d"}}}
+    source = {:foo => "a", :bar => "b", :baz => "c", :boo => "d"}
     @translation = Babelicious::Mapper.translate(@tag.to_sym, source)
   end
 end
@@ -141,14 +140,14 @@ Then /^the xml should be correctly mapped$/ do
   when {:from => :hash, :to => :xml}
     @translation.to_s.gsub(/\s/, '').should == '<?xmlversion="1.0"encoding="UTF-8"?><bar><foo>a</foo><boo>b</boo><cuk><coo>c</coo><doo>d</doo></cuk></bar>'    
   when {:from => :hash, :to => :hash}
-    @translation.should == {"doo"=>"d", "foo"=>{"bar"=>{"coo"=>"c"}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
+    @translation.should == {"zoo" => "a", "yoo" => "b", "too" => "c", "soo" => {"roo" => "d"}}
   end
 end
 
 Then /^the xml should properly transform nested nodes for '(.*)'$/ do |node_type|
   case node_type
   when /differently named/
-    @translation.should == {"foo"=>{"cuk" => {"boo" => ["d"], "coo" => {"id" => "c"}}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
+    @translation.should == {"foo"=>{"cuk" => {"boo" => "d", "coo" => {"id" => "c"}}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
   when /similarly named/
     @translation.should == {"foo"=>{"cuk" => {"boo" => ["d", "e"], "coo" => {"id" => "c"}}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
   when /partially empty/
