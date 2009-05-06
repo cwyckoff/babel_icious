@@ -1,6 +1,6 @@
 spec = Gem::Specification.new do |s|
   s.name = 'babel_icious'
-  s.version = '0.0.4.5'
+  s.version = '0.0.4.6'
   s.date = '2009-04-24'
   s.summary = 'Babel_icious dynamic and scalable mapping tool'
   s.email = "github@cwyckoff.com"
@@ -22,5 +22,6 @@ spec = Gem::Specification.new do |s|
              "lib/babel_icious/mapper.rb",
              "lib/babel_icious/path_translator.rb",
              "lib/babel_icious/target_mapper.rb",
+             "lib/babel_icious/core_ext/libxml_node.rb",
              "lib/babel_icious/core_ext/enumerable.rb"]
 end
