@@ -33,20 +33,6 @@ Given /^a mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |source, targ
   end
 end
 
-Given /^a mapping exists with nested nodes$/ do 
-  Babelicious::Mapper.reset
-  @direction = {:from => :xml, :to => :hash}
-  @tag = :baz
-
-  Babelicious::Mapper.config(@tag) do |m|
-    m.direction(@direction)
-
-    m.map :from => "foo/bar", :to => "bar/foo"
-    m.map :from => "foo/baz", :to => "bar/boo"
-    m.map :from => "foo/cuk", :to => "foo/"
-  end
-end
-
 Given /^a mapping exists with '(.*)' condition$/ do |condition|
   case condition
   when /unless/
@@ -56,7 +42,7 @@ Given /^a mapping exists with '(.*)' condition$/ do |condition|
       m.map :from => "foo/bar", :to => "bar/foo"
       m.map(:from => "foo/baz", :to => "bar/boo").unless(:empty)
     end
-  when /when/
+ when /when/
     Babelicious::Mapper.config(:when) do |m|
       m.direction :from => :xml, :to => :hash
 
@@ -74,16 +60,26 @@ Given /^a mapping exists with concatenation$/ do
   Babelicious::Mapper.config(:concatenation) do |m|
     m.direction :from => :xml, :to => :hash
 
-    m.map :from => "foo/cuk", :to => "foo/bar", :concatenate => "|"
+    # <event><decision_request><target_factors><institutions><institution>FOO</institution><institution>BAR</institution><institution>BAZ</institution></institutions></target_factors></decision_request></event>
+    m.map(:from => "event/decision_request/target_factors/institutions", :to => "event/new_update_status_code").customize do |node|
+      node.concatenate_children("|")
+    end
   end
 end
 
-Given /^a mapping exists with a merge$/ do
-  Babelicious::Mapper.config(:merge) do |m|
+Given /^a mapping exists with a customized block$/ do
+  Babelicious::Mapper.config(:customized) do |m|
     m.direction :from => :xml, :to => :hash
-
-    m.map(:from => "foo/bar", :to => "bar/foo").merge("foo/baz")
-  end
+    
+    # <event><progress><statuses><status><code>Abandoned</code><message>bad phone</message></status></statuses></progress></event>
+    m.map(:from => "event/progress/statuses", :to => "event/new_update_status_code").customize do |node|
+      res = []
+      node.each_element do |nd|
+        res << {"name" => nd.child_content("code"), "text" => nd.child_content("message")}
+      end
+      res
+    end
+  end 
 end
 
 
@@ -104,23 +100,6 @@ When /^the mapping is translated$/ do
   end
 end
 
-When /^the mapping with '(.*)' nested nodes is translated$/ do |node_type|
-  case node_type
-  when /differently named/
-    xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo><id>c</id></coo><boo>d</boo></cuk></foo>' 
-    @translation = Babelicious::Mapper.translate(@tag.to_sym, xml)
-  when /similarly named/
-    xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo><id>c</id></coo><boo>d</boo><boo>e</boo></cuk></foo>' 
-    @translation = Babelicious::Mapper.translate(@tag.to_sym, xml)
-  when /partially empty/
-    xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo><id>c</id></coo><boo></boo></cuk></foo>' 
-    @translation = Babelicious::Mapper.translate(@tag.to_sym, xml)
-  when /identical/
-    xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo><id>c</id></coo><coo><id>d</id></coo></cuk></foo>' 
-    @translation = Babelicious::Mapper.translate(@tag.to_sym, xml)
-  end
-end
-
 When /^the '(.*)' mapping is translated$/ do |condition|
   case condition
   when /unless/
@@ -133,12 +112,16 @@ When /^the '(.*)' mapping is translated$/ do |condition|
 end
 
 When /^the mapping with concatenation is translated$/ do
-  xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo>c</coo><coo>d</coo><coo>e</coo></cuk></foo>' 
+#  xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo>c</coo><coo>d</coo><coo>e</coo></cuk></foo>' 
+  xml = '<event><decision_request><target_factors><institutions><institution>FOO</institution><institution>BAR</institution><institution>BAZ</institution></institutions></target_factors></decision_request></event>'
   @translation = Babelicious::Mapper.translate(:concatenation, xml)
 end
 
-When /^the merged mapping is translated$/ do
-  pending
+When /^the customized mapping is translated$/ do
+#  xml = '<foo><bar>baz</bar><cuk>coo</cuk></foo>'
+#  xml = '<statuses><status><code>Abandoned</code><message>bad phone</message></status><status><code>Rejected</code><message>bad word</message></status></statuses>'
+  xml = '<event><progress><statuses><status><code>Abandoned</code><message>bad phone</message></status><status><code>Rejected</code><message>bad word</message></status></statuses></progress></event>'
+  @translation = Babelicious::Mapper.translate(:customized, xml)
 end
 
 
@@ -156,19 +139,6 @@ Then /^the xml should be correctly mapped$/ do
   end
 end
 
-Then /^the xml should properly transform nested nodes for '(.*)'$/ do |node_type|
-  case node_type
-  when /differently named/
-    @translation.should == {"foo"=>{"cuk" => {"boo" => "d", "coo" => {"id" => "c"}}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
-  when /similarly named/
-    @translation.should == {"foo"=>{"cuk" => {"boo" => ["d", "e"], "coo" => {"id" => "c"}}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
-  when /partially empty/
-    @translation.should == {"foo"=>{"cuk" => {"boo" => "", "coo" => {"id" => "c"}}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
-  when /identical/
-    @translation.should == {"foo"=>{"cuk" => {"coo" => [{"id" => "c"}, {"id" => "d"}]}}, "bar"=>{"boo"=>"b", "foo"=>"a"}}
-  end
-end 
-
 Then /^the target should be correctly processed for condition '(.*)'$/ do |condition|
   case condition
   when /unless/
@@ -179,9 +149,12 @@ Then /^the target should be correctly processed for condition '(.*)'$/ do |condi
 end
 
 Then /^the target should be properly concatenated$/ do
-  @translation.should == {"foo"=>{"bar"=>"c|d|e"}}
+  @translation.should == {"event"=>{"new_update_status_code"=>"FOO|BAR|BAZ"}}
+#  @translation.should == {"foo"=>{"bar"=>"c|d|e"}}
 end
 
-Then /^the merged target should be correctly processed$/ do
-  pending
+Then /^the customized target should be correctly processed$/ do
+  @translation.should == {"event"=>{"new_update_status_code"=>[{"name"=>"Abandoned", "text"=>"bad phone"}, {"name"=>"Rejected", "text"=>"bad word"}]}}
+#  @translation.should == {"new_update_status_code"=>[{"name"=>"Abandoned", "text"=>"bad phone"}, {"name"=>"Rejected", "text"=>"bad word"}]}
+#  @translation.should == {"boo" => [{"bum" => "baz", "dum" => "coo"}]}
 end

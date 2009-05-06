@@ -39,6 +39,26 @@ module Babelicious
       
     end
 
+    describe ".customize" do 
+      
+      before(:each) do
+        Mapper.reset
+        Mapper.config(:foo) { |m| m.direction :from => :xml, :to => :hash}
+      end
+      
+      it "should delegate it to target mapper" do 
+        # expect
+        @target_mapper.should_receive(:register_customized) #.with(:when, an_instance_of(Proc)).and_return(@when_conditions)
+        
+        # given
+        Mapper.map({:to => "bar/foo", :from => "foo/bar"}).customize do |value|
+          # the value of "bar/foo" is itself a hash {:bar => "a", :cuk => "b"}
+          [{:bum => value[:bar], :coo => value[:cuk]}]
+        end
+      end
+      
+    end
+    
     describe ".direction" do 
       
       it "should set direction of the mapping" do 

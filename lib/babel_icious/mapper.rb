@@ -14,6 +14,10 @@ module Babelicious
         yield self
       end
 
+      def customize(&block)
+        current_target_mapper.register_customized(&block)
+      end
+
       def direction(dir={})
         current_target_mapper.direction = @direction = dir
       end
@@ -26,10 +30,6 @@ module Babelicious
       def mappings
         @mapped_targets ||= {}
       end
-      
-#       def merge(from={})
-#         current_target_mapper.register_merge(from)
-#       end
       
       def reset
         @mapped_targets, @direction = nil, {}
@@ -47,6 +47,7 @@ module Babelicious
 
       def unless(condition=nil, &block)
         current_target_mapper.register_condition(:unless, condition, &block)
+        self
       end
       
       private

@@ -21,24 +21,12 @@ Scenario Outline: Mapping with conditions
   | unless	|
   | when	|
 
-# Scenario: Mapping hash with merge
-#   Given a mapping exists with a merge
-#   When the merged mapping is translated
-#   Then the merged target should be correctly processed 
+Scenario: Mapping hash with custom block
+  Given a mapping exists with a customized block
+  When the customized mapping is translated
+  Then the customized target should be correctly processed 
 
-Scenario Outline: Mapping from xml with multiple nested nodes
-  Given a mapping exists with nested nodes
-  When the mapping with '<NodeType>' nested nodes is translated
-  Then the xml should properly transform nested nodes for '<NodeType>'
-
-  Examples:
-  | NodeType		|
-  | differently named 	|
-  | similarly named 	|
-  | partially empty 	|
-  | identical 		|
-
-Scenario: Mapping from xml with concatenation
+ Scenario: Mapping from xml with concatenation
   Given a mapping exists with concatenation
   When the mapping with concatenation is translated
   Then the target should be properly concatenated

@@ -44,19 +44,6 @@ module Babelicious
         }
       end
       
-      describe "when concatenation option is set" do 
-
-        it "should delegate to Concatenation mapper" do 
-          # expect
-          HashMappingStrategies::Concatenate.should_receive(:map)
-          
-          # given
-          hash_map = HashMap.new(@path_translator, {:concatenate => "|"})
-          hash_map.map_from(@target_hash, {"foos" => {"foo" => ["foo", "bar", "baz"]}})
-        end
-        
-      end
-      
       describe "map condition is set" do 
 
         before(:each) do 
@@ -124,19 +111,4 @@ module Babelicious
     
   end
 
-  module HashMappingStrategies
-
-    describe Concatenate do 
-
-      describe "when source value is a hash" do 
-        
-        it "should combine elements in source value array" do 
-          Concatenate.map({"foos" => {"foo" => ["foo", "bar", "baz"]}}, "|").should == "foo|bar|baz"
-        end
-
-      end
-
-    end
-    
-  end
 end

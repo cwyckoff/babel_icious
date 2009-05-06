@@ -32,6 +32,10 @@ module Babelicious
       @mappings.last[1].register_condition(condition_key, condition, &block)
     end
     
+    def register_customized(&block)
+      @mappings.last[1].register_customized(&block)
+    end
+    
     def register_mapping(opts={})
       raise TargetMapperError, "Both :from and :to keys must be set (e.g., {:from => \"foo/bar\", :to => \"bar/foo\")" unless (opts[:from] && opts[:to])
       target = MapFactory.target(@direction, opts)

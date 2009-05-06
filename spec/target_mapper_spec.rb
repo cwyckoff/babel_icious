@@ -27,6 +27,18 @@ module Babelicious
       end
       
     end
+
+    describe "#register_customized" do 
+      
+      it "should delegate to target map element" do 
+        # expect
+        @target_element.should_receive(:register_customized)
+        
+        # given
+        @target_mapper.register_customized
+      end
+      
+    end
     
     describe "#register_mapping" do 
 

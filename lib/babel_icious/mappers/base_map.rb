@@ -13,6 +13,10 @@ module Babelicious
     def register_condition(condition_key, condition, &block)
       map_condition.register(condition_key, condition, &block)
     end
+
+    def register_customized(&block)
+      @customized_map = block
+    end
     
     protected
 

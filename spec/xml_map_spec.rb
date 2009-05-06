@@ -71,18 +71,27 @@ module Babelicious
 
     describe "#value_from" do 
 
-      it "should delegate to XmlValueMapper" do
-        # given
-        path_translator = mock("PathTranslator", :full_path => "foo/bar")
-        source = mock("XML::Document", :find => [node = mock("XML::Node")])
-        XmlValueMapper.stub!(:new).and_return(xml_value_mapper = mock("XmlValueMapper"))
+      before(:each) do 
+        @child_node = mock("XML::Node")
+        @node = mock("XML::Node", :children => [@child_node], :content => "foo")
+        @source = mock("XML::Document", :find => [@node])
+      end
+      
+      describe "when node has only one child" do 
+        
+        it "should return node content" do 
+          XmlMap.new(@path_translator).value_from(@source).should == "foo"
+        end
+        
+      end
 
-        # expect
-        xml_value_mapper.should_receive(:map).with(node)
-
-        # when
-        XmlMap.new(path_translator).value_from(source)
-      end 
+      describe "when node has only one child" do 
+        
+        it "should return node" do 
+          @node.stub!(:children).and_return([@child_node, @child_node])
+          XmlMap.new(@path_translator).value_from(@source).should == @node
+        end
+      end
       
     end
     
@@ -116,37 +125,4 @@ module Babelicious
         
     end
   end
-
-
-  describe XmlValueMapper do
-    
-    describe "filtering" do 
-      
-      describe "when node has children" do 
-        
-        before(:each) do
-          @path_translator = mock("PathTranslator", :full_path => "foo/bar", :last => "bar")
-          @node = mock("XML::Node", :children => [mock("XML::Node"), mock("XML::Node")])
-          @source = mock("XML::Document", :find => [@node])
-        end
-        
-        describe "when node has children and no options are set" do
-          
-          it "should map child nodes" do
-            pending
-            # expect
-            XmlSourceMappingStrategies::ChildNodeMapper.should_receive(:map).with(@node, {}).and_return({'institutions' => {'institution' => ['foo', 'bar', 'baz'] }})
-            
-            # given
-            xml_value_mapper = XmlValueMapper.new({})
-            xml_value_mapper.map(@node)
-          end 
-        end
-        
-      end
-
-    end 
-    
-  end
 end
-

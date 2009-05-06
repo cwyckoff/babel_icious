@@ -22,7 +22,11 @@ module Babelicious
     
     def value_from(source)
       source.find("/#{@path_translator.full_path}").each do |node|
-        return xml_value_mapper.map(node)
+        if(node.children.size > 1)
+          return node
+        else
+          return node.content
+        end
       end
     end
 
@@ -70,80 +74,6 @@ module Babelicious
         return true
       end 
       false
-    end
-    
-    def xml_value_mapper
-      @xml_value_mapper ||= XmlValueMapper.new(@path_translator, @opts)
-    end
-  end
-
-  
-  class XmlValueMapper
-
-    def initialize(path_translator, opts={})
-      @path_translator, @opts = path_translator, opts
-    end
-    
-    def map(node)
-      if(node.children.size > 1)
-        content = {}
-         map_child(node, content)
-      else
-        return node.content
-      end
-    end
-
-    private
-    
-    def map_child(node, content)
-      node.each_element do |child|
-        if(content[child.name])
-          update_content_key(content, child)
-        else
-          create_content_key(content, child)
-        end 
-      end
-      {node.name => content}
-    end
-    
-    private
-    
-    def content_value_is_array?(content, child) 
-      content[child.name].is_a?(Array)
-    end 
-    
-    def create_content_key(content, child)
-      unless final_node?(child)
-        content[child.name] = {child.child.name => child.child.content}
-      else 
-        set_value_in_array(content, child)
-      end
-    end
-    
-    def final_node?(child)
-      !child.children? || !child.child.children?
-    end
-    
-    def set_value_in_array(content, child)
-      content[child.name] = [] unless content_value_is_array?(content, child)
-      if(child.children?)
-        if((child.parent.find(child.name)).to_a.size == 1)
-          content[child.name] = child.child.content
-        else 
-          content[child.name] << child.child.content
-        end
-      else
-        content[child.name] = ""
-      end 
-    end
-
-    def update_content_key(content, child)
-      unless final_node?(child)
-        content[child.name] = [content[child.name]] unless content_value_is_array?(content, child) 
-        content[child.name] << {child.child.name => child.child.content}
-      else 
-        set_value_in_array(content, child)
-      end
     end
   end
 
