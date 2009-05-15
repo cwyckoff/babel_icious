@@ -177,6 +177,7 @@ module Babelicious
       before(:each) do 
         @xml = '<foo>bar</foo>'
         @source_element.stub!(:class).and_return(@xml_map_klass = mock("XmlMapKlass", :filter_source => @xml))
+        @target_element.stub!(:opts).and_return({})
       end
       
       def do_process
@@ -194,9 +195,36 @@ module Babelicious
           @xml_map_klass.should_receive(:filter_source).with(@xml).once
         }
       end
-      
+
+      context "when block has been passed to #to method" do 
+
+        before(:each) do 
+          @path_translator = mock("PathTranslator", :set_path => nil)
+          @target_element.stub!(:path_translator).and_return(@path_translator)
+          @proc = mock("Proc", :call => "baz")
+          @target_element.stub!(:opts).and_return({:to_proc => @proc})
+        end 
+
+        it "should call proc" do 
+          during_process { 
+            @proc.should_receive(:call).and_return("baz")
+          }
+        end 
+        
+        it "should set path on path translator" do 
+          during_process { 
+            @path_translator.should_receive(:set_path).with("baz")
+          }
+        end 
+
+        it "should map source to target element" do 
+          during_process { 
+            @target_element.should_receive(:map_from).with({}, "bar").and_return({})
+          }
+        end 
+
+      end 
     end
-  
   end
 
 end
