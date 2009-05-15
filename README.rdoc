@@ -47,7 +47,7 @@ the slash indicates that "bar" is a nested hash within "foo".  The target xml th
 with the value of "bar" from the hash above placed in the nested <foo> tags in the xml.
 
 
-== Translation
+=== Translation
 
 When you want to translate the mappings, simply call:
 
@@ -71,9 +71,10 @@ if the value at "foo/bar" is empty or nil, "foo/bar" will not be translated.  Ad
 will only translate if the value at "foo/bar" begins with a capital "M".
 
 
-== Customized mappings
+=== Customized mappings
 
-=== .to
+
+==== .to
 
 If your target mapping is conditional, you may use the .to method which takes a block.  The block yields the value of the source mapping for you to use.
 
@@ -87,7 +88,8 @@ If your target mapping is conditional, you may use the .to method which takes a 
 
 Note that the .to method must be used in conjunction with .from, which takes a simple string for the source mapping.
 
-=== .customize
+
+==== .customize
 
 If you have a complex mapping and need to customize it in some way, use the .customize method and pass it a block.  The block yields the source object for you to manipulate.  Let's say you're mapping xml to a hash where the xml source looks like:
 
