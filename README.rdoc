@@ -47,6 +47,15 @@ the slash indicates that "bar" is a nested hash within "foo".  The target xml th
 with the value of "bar" from the hash above placed in the nested <foo> tags in the xml.
 
 
+== Translation
+
+When you want to translate the mappings, simply call:
+
+ Babelicious::Mapper.translate(:foo, source)
+
+passing the tag for the mapping and the actual source you want to translate from.
+
+
 === Conditions
 
 You can also qualify your mappings with the methods "unless" and "when".  For example, if you do not want to translate mappings that lack a value, simply add an "unless" method:
@@ -66,7 +75,7 @@ will only translate if the value at "foo/bar" begins with a capital "M".
 
 === .to
 
-If your target mapping is conditional, you may use the .to method which takes a block
+If your target mapping is conditional, you may use the .to method which takes a block.  The block yields the value of the source mapping for you to use.
 
    m.from("foo/bar").to do |value|
      if(value == "baz")
@@ -77,7 +86,6 @@ If your target mapping is conditional, you may use the .to method which takes a 
    end
 
 Note that the .to method must be used in conjunction with .from, which takes a simple string for the source mapping.
-
 
 === .customize
 
@@ -112,12 +120,3 @@ which would produce
   {"event" => {"concatenated_institutions" => "FOO|BAR|BAZ"}}
 
 (note: 'concatentate' is a convenience method I've added to the libxml XML::Node object)
-
-
-== Translation
-
-Finally, when you want to translate the mappings, simply call:
-
- Babelicious::Mapper.translate(:foo, source)
-
-passing the tag for the mapping and the actual source you want to translate from.
