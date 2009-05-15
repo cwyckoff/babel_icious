@@ -31,3 +31,7 @@ Scenario: Mapping hash with custom block
   When the mapping with concatenation is translated
   Then the target should be properly concatenated
 
+Scenario: Mapping with .from and .to methods
+  Given a mapping exists with custom .to method
+  When the mapping with custom .to method is translated
+  Then the target should be correctly processed for custom .to conditions

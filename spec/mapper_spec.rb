@@ -73,6 +73,20 @@ module Babelicious
       end
       
     end
+
+    describe ".from" do 
+
+      it "should delegate source path to target mapper" do 
+        # expect
+        @target_mapper.should_receive(:register_from).with("foo/bar")
+
+        # given
+        Mapper.reset
+        Mapper.from("foo/bar")
+      end 
+
+    end 
+
     
     describe ".map" do 
       
@@ -110,6 +124,25 @@ module Babelicious
         Mapper.mappings.should == {}
       end
     end
+
+    describe ".to" do 
+
+      it "should delegate target block to target mapper" do 
+        # expect
+        @target_mapper.should_receive(:register_to) #.with(kind_of(Proc))
+
+        # given
+        Mapper.reset
+        Mapper.to do |value|
+          if(value=="baz")
+            "value/is/baz"
+          else 
+            "value/is/not/baz"
+          end 
+        end 
+      end 
+
+    end 
     
     describe ".translate" do 
 

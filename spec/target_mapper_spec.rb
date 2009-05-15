@@ -39,7 +39,38 @@ module Babelicious
       end
       
     end
+
+    describe "#register_from" do 
+      
+      it "should create new source object" do 
+        # expect
+        MapFactory.should_receive(:source).with({:from => :xml, :to => :hash}, {:from => "foo/bar"})
+        
+        # given
+        @target_mapper.register_from("foo/bar")
+      end
+
+      it "should add source to mappings array" do 
+        # given
+        @target_mapper.reset
+
+        # when
+        @target_mapper.register_from("foo/bar")
+
+        # expect
+        @target_mapper.mappings.should == [[@source_element]]
+      end 
+
+      context "when argument is nil" do 
+
+        it "should raise an error" do 
+          running { @target_mapper.register_from(nil) }.should raise_error(TargetMapperError)
+        end 
+      end 
+
+    end
     
+
     describe "#register_mapping" do 
 
       def do_process
@@ -89,13 +120,44 @@ module Babelicious
         }
       end
       
-      describe "when :to or :from are not set" do 
+      context "when :to or :from are not set" do 
         
         it "should raise an error" do 
           running { @target_mapper.register_mapping({})}.should raise_error(TargetMapperError)
         end
         
       end
+    end
+
+    describe "#register_to" do 
+      
+      it "should create new source object" do 
+        # expect
+        MapFactory.should_receive(:target).with({:from => :xml, :to => :hash}, {:to => '', :to_proc => nil})
+        
+        # given
+        @target_mapper.register_to
+      end
+
+      it "should add source to mappings array" do 
+        # given
+        @target_mapper.reset
+        @target_mapper.mappings << [@source_element]
+        @target_mapper.register_to
+
+        # expect
+        @target_mapper.mappings.should == [[@source_element, @target_element]]
+      end 
+
+      context "if .from has not been set before calling .to" do 
+        
+        it "should raise an error" do 
+          # given
+          @target_mapper.reset
+
+          running { @target_mapper.register_to }.should raise_error(TargetMapperError)
+        end 
+      end 
     end
 
     describe "#reset" do 

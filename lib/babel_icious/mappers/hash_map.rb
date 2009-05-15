@@ -29,11 +29,7 @@ module Babelicious
       end
     end
 
-    private
-    
-    def source_element(source, element)
-      source[element.to_sym] || source[element.to_s]
-    end
+    protected
 
     def map_output(hash_output, source_value)
       catch :no_value do
@@ -46,6 +42,12 @@ module Babelicious
         end
       end 
     end 
+
+    private
+    
+    def source_element(source, element)
+      source[element.to_sym] || source[element.to_s]
+    end
     
     def map_source_value(source_value)
       if(@customized_map)

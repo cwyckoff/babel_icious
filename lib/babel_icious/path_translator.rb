@@ -5,8 +5,7 @@ module Babelicious
     include Enumerable
     
     def initialize(untranslated_path)
-      @full_path = untranslated_path
-      @parsed_path = translate(untranslated_path)
+      set_path(untranslated_path)
     end
 
     def [](index)
@@ -25,6 +24,11 @@ module Babelicious
       @parsed_path.last
     end
     
+    def set_path(untranslated_path)
+      @full_path = untranslated_path
+      @parsed_path = translate(untranslated_path)
+    end 
+
     def size
       @parsed_path.size
     end

@@ -1,7 +1,8 @@
 module Babelicious
   
   class BaseMap
-    
+    attr_reader :opts, :path_translator
+
     def map_from(output, source_value)
       if map_condition?
           map_output(output, source_value) if map_condition.is_satisfied_by(source_value)

@@ -21,6 +21,11 @@ module Babelicious
       def direction(dir={})
         current_target_mapper.direction = @direction = dir
       end
+
+      def from(from_str=nil)
+        current_target_mapper.register_from(from_str)
+        self
+      end
       
       def map(opts={})
         current_target_mapper.register_mapping(opts)
@@ -35,6 +40,11 @@ module Babelicious
         @mapped_targets, @direction = nil, {}
       end
 
+      def to(&block)
+        current_target_mapper.register_to(&block)
+        self
+      end
+      
       def translate(key=nil, source=nil)
         raise MapperError, "No target mapper exists for key #{key}" unless mappings.has_key?(key)
         

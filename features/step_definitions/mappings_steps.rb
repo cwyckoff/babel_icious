@@ -74,10 +74,23 @@ Given /^a mapping exists with a customized block$/ do
     # <event><progress><statuses><status><code>Abandoned</code><message>bad phone</message></status></statuses></progress></event>
     m.map(:from => "event/progress/statuses", :to => "event/new_update_status_code").customize do |node|
       res = []
-      node.each_element do |nd|
-        res << {"name" => nd.child_content("code"), "text" => nd.child_content("message")}
-      end
+      node.elements.map { |nd| res << {"name" => nd.child_content("code"), "text" => nd.child_content("message")} }
       res
+    end
+  end 
+end
+
+Given /^a mapping exists with custom \.to method$/ do
+  Babelicious::Mapper.config(:custom_to) do |m|
+    m.direction :from => :xml, :to => :hash
+
+    # xml = "<foo><bar>baz</bar></foo>"
+    m.from("foo/bar").to do |value|
+      if(value == "baz")
+        "value/was/baz"
+      else 
+        "value/was/not/baz"
+      end 
     end
   end 
 end
@@ -124,6 +137,11 @@ When /^the customized mapping is translated$/ do
   @translation = Babelicious::Mapper.translate(:customized, xml)
 end
 
+When /^the mapping with custom \.to method is translated$/ do
+  xml = "<foo><bar>baz</bar></foo>"
+  @translation = Babelicious::Mapper.translate(:custom_to, xml)
+end
+
 
 #
 ##
@@ -157,4 +175,9 @@ Then /^the customized target should be correctly processed$/ do
   @translation.should == {"event"=>{"new_update_status_code"=>[{"name"=>"Abandoned", "text"=>"bad phone"}, {"name"=>"Rejected", "text"=>"bad word"}]}}
 #  @translation.should == {"new_update_status_code"=>[{"name"=>"Abandoned", "text"=>"bad phone"}, {"name"=>"Rejected", "text"=>"bad word"}]}
 #  @translation.should == {"boo" => [{"bum" => "baz", "dum" => "coo"}]}
+end
+
+Then /^the target should be correctly processed for custom \.to conditions$/ do
+#  xml = "<foo><bar>baz</bar></foo>"
+  @translation.should == { "value" => { "was" => { "baz" => "baz"}}}
 end

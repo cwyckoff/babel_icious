@@ -30,7 +30,7 @@ module Babelicious
       end
     end
 
-    private
+    protected
     
     def map_output(xml_output, source_value)
       @index = @path_translator.last_index
@@ -43,6 +43,8 @@ module Babelicious
       end 
     end
     
+    private
+
     def populate_nodes(xml_output)
       return if @index == 0
 
@@ -64,7 +66,6 @@ module Babelicious
       if xml_output.root.nil?
         xml_output.root = XML::Node.new(@path_translator[0])
       end 
-
     end
     
     def update_node?(xml_output, source_value)

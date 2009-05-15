@@ -47,6 +47,26 @@ module Babelicious
       
     end
 
+    describe "#set_path" do 
+      
+      def do_process
+        @translator.set_path("foo/bar")
+      end 
+
+      it "should set full_path" do 
+        after_process { 
+          @translator.full_path.should == "foo/bar"
+        }
+      end 
+
+      it "should set parsed_path" do 
+        after_process { 
+          @translator.parsed_path.should == ["foo", "bar"]
+        }
+      end 
+
+    end 
+
     describe "#translate" do 
       
       it "should split path elements into array" do 

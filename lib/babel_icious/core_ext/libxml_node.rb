@@ -15,6 +15,12 @@ module BabeliciousNodeHacks
     child_arr(child).first.name
   end
   
+  def elements
+    e = []
+    self.each_element {|elem| e << elem}
+    e
+  end
+  
   private
   
   def child_arr(child)
