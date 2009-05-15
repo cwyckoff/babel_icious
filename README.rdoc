@@ -86,7 +86,7 @@ If your target mapping is conditional, you may use the .to method which takes a 
      end
    end
 
-Note that the .to method must be used in conjunction with .from, which takes a simple string for the source mapping.
+This will use "value/is/baz" as its target mapping if the source value is "baz", otherwise, the mapping defaults to "value/is/something/else".  *Note that the .to method must be used in conjunction with .from, which takes a simple string for the source mapping.*
 
 
 ==== .customize
