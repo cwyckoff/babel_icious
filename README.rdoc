@@ -1,6 +1,6 @@
 = Babel-icious
 
-A flexible and scalable mapping tool that currently only supports mapping hashes and xml.
+Are you tired of ugly data munging (in Rails controllers or models, for instance).  Well, Babel_icious is a flexible and scalable mapping tool that currently only supports mapping hashes and xml.  It allows you to set up mapping definitions separate from your code that requires mapping.  By defining mappings in a separate file or files, you can easily keep your code clean and focused on its core responsibilities.
 
 
 == Author
@@ -15,7 +15,8 @@ Add a mapper for JSON.
 
 == Examples
 
-Mappings are set up by calling passing mapping 'coordinates' to a 'config' block on the Mapper class:
+
+Babel_icious mappings should ideally be written in their own file or files, separate from the code that actually requires mapping.  Just include the mapping files at runtime.  A mapping is configured by passing mapping 'coordinates' to a 'config' block on the Mapper class:
 
  Babelicious::Mapper.config(:foo) do |m|
   
@@ -28,7 +29,7 @@ Mappings are set up by calling passing mapping 'coordinates' to a 'config' block
   
  end
 
-The 'config' method takes a symbol as its first argument which serves as an identification tag for that mapping.  The second argument is a block where you indiate the details of your mapping.  This should include a direction indicator and individual mapping 'coordinates'.
+The 'config' method takes a symbol as its first argument which serves as an identification tag for that mapping.  The second argument is a block where you indiate the details of your mapping, which should include a direction indicator and individual mapping 'coordinates', as well as a series of 'to' and 'from' mappings.  The line
 
  m.direction :from => :xml, :to => :hash
 
@@ -53,7 +54,7 @@ When you want to translate the mappings, simply call:
 
  Babelicious::Mapper.translate(:foo, source)
 
-passing the tag for the mapping and the actual source you want to translate from.
+passing the tag for the mapping and the actual source you want to translate from.  The above line would translate the :foo mapping above.
 
 
 === Conditions
@@ -72,7 +73,6 @@ will only translate if the value at "foo/bar" begins with a capital "M".
 
 
 === Customized mappings
-
 
 ==== .to
 
