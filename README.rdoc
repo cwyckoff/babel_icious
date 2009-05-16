@@ -1,6 +1,6 @@
 = Babel-icious
 
-Are you tired of ugly data munging (in Rails controllers or models, for instance).  Well, Babel_icious is a flexible and scalable mapping tool for mapping hashes and xml.  It allows you to set up mapping definitions separate from your code that requires mapping.  By defining mappings in a separate file or files, you can easily keep your code clean and focused on its core responsibilities.
+Are you tired of ugly data munging in Rails controllers or models, for instance.  Well, Babel_icious is a flexible mapping tool for mapping hashes and xml.  It allows you define mappings separate from your code, keeping your code clean and focused on its core responsibilities.  The mappings themselves are then easy to understand and modify if and when your code changes.
 
 
 == Author
@@ -74,9 +74,11 @@ will only translate if the value at "foo/bar" begins with a capital "M".
 
 === Customized mappings
 
+Babel_icious provides a few powerful ways of handling customized mappings.
+
 ==== .to
 
-If your target mapping is conditional, you may use the .to method which takes a block.  The block yields the value of the source mapping for you to use.
+If your *target* mapping depends upon one or more conditions, you may use the .to method which takes a block.  The block yields the value of the source mapping for you to evaluate any conditions necessary.
 
    m.from("foo/bar").to do |value|
      if(value == "baz")
@@ -86,18 +88,17 @@ If your target mapping is conditional, you may use the .to method which takes a 
      end
    end
 
-This will use "value/is/baz" as its target mapping if the source value is "baz", otherwise, the mapping defaults to "value/is/something/else".  *Note that the .to method must be used in conjunction with .from, which takes a simple string for the source mapping.*
-
+The above mapping, for example, will use "value/is/baz" as its target mapping if the source value is "baz", otherwise, the mapping defaults to "value/is/something/else".  (Note that the .to method must be used in conjunction with .from, which takes a simple string for the source mapping.)
 
 ==== .customize
 
 If you have a complex mapping and need to customize it in some way, use the .customize method and pass it a block.  The block yields the source object for you to manipulate.  Let's say you're mapping xml to a hash where the xml source looks like:
 
-  <event><progress><statuses><status><code>Foo</code><message>Bar</message></status></statuses></progress></event>
+  <statuses><status><code>Foo</code><message>Bar</message></status></statuses>
 
 You need to map statuses so that the output looks like [{"name" => "Foo", "text" => "Bar"}].  Here's how you could customize your mapping:
 
-  m.map(:from => "event/progress/statuses", :to => "event/status_code").customize do |node|
+  m.map(:from => "statuses", :to => "status_code").customize do |node|
     res = []
     node.elements.map {|nd| res << {"name" => nd.child_content("code"), "text" => nd.child_content("message")}
     res
@@ -105,20 +106,20 @@ You need to map statuses so that the output looks like [{"name" => "Foo", "text"
 
 This mapping would produce:
 
-  {"event" => {"status_code" => [{"name" => "Foo", "text" => "Bar"}]}}
+  {"status_code" => [{"name" => "Foo", "text" => "Bar"}]}
 
 A more common use case is concatenation of nested xml nodes.  Given the following xml:
 
-  <event><institutions><institution>FOO</institution><institution>BAR</institution><institution>BAZ</institution></institutions></event>
+  <institutions><institution>FOO</institution><institution>BAR</institution><institution>BAZ</institution></institutions>
 
-You could easily concatentate institutions with the following mapping:
+You could easily concatentate the institutions nested within the <institutions> node with the following mapping:
 
-  m.map(:from => "event/institutions", :to => "event/concatenated_institutions").customize do |node|
+  m.map(:from => "institutions", :to => "concatenated_institutions").customize do |node|
     node.concatenate_children("|")
   end
 
-which would produce
+This mapping would produce
 
-  {"event" => {"concatenated_institutions" => "FOO|BAR|BAZ"}}
+  {"concatenated_institutions" => "FOO|BAR|BAZ"}
 
 (note: 'concatentate' is a convenience method I've added to the libxml XML::Node object)
