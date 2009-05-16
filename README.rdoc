@@ -1,6 +1,6 @@
 = Babel-icious
 
-Are you tired of ugly data munging (in Rails controllers or models, for instance).  Well, Babel_icious is a flexible and scalable mapping tool that currently only supports mapping hashes and xml.  It allows you to set up mapping definitions separate from your code that requires mapping.  By defining mappings in a separate file or files, you can easily keep your code clean and focused on its core responsibilities.
+Are you tired of ugly data munging (in Rails controllers or models, for instance).  Well, Babel_icious is a flexible and scalable mapping tool for mapping hashes and xml.  It allows you to set up mapping definitions separate from your code that requires mapping.  By defining mappings in a separate file or files, you can easily keep your code clean and focused on its core responsibilities.
 
 
 == Author
