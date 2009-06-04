@@ -3,7 +3,7 @@ require 'xml/libxml'
 module BabeliciousNodeHacks
 
   def concatenate_children(glue)
-    res = self.children.inject('') {|a,b| a << "#{b.content}#{glue}"}
+    res = self.children.inject('') {|a,b| a << "#{b.content.strip}#{glue.strip}"}
     res.chop
   end
   
