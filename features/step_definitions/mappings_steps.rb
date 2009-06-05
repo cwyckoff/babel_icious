@@ -102,7 +102,16 @@ end
 When /^the mapping is translated$/ do
   case @direction
   when {:from => :xml, :to => :hash}
-    xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo>c</coo><doo>d</doo></cuk></foo>' 
+    xml = <<-EOL
+<foo>
+ <bar>a</bar>
+ <baz>b</baz>
+ <cuk>
+  <coo>c</coo>
+  <doo>d</doo>
+ </cuk>
+</foo>
+EOL
     @translation = Babelicious::Mapper.translate(@tag.to_sym, xml)
   when {:from => :hash, :to => :xml}
     source = {:foo => {:bar => "a", :baz => "b", :cuk => {:coo => "c", :doo => "d"}}}
@@ -126,7 +135,19 @@ end
 
 When /^the mapping with concatenation is translated$/ do
 #  xml = '<foo><bar>a</bar><baz>b</baz><cuk><coo>c</coo><coo>d</coo><coo>e</coo></cuk></foo>' 
-  xml = '<event><decision_request><target_factors><institutions><institution>FOO</institution><institution>BAR</institution><institution>BAZ</institution></institutions></target_factors></decision_request></event>'
+  xml = <<-EOL
+<event>
+ <decision_request>
+ <target_factors>
+  <institutions>
+   <institution>FOO</institution>
+   <institution>BAR</institution>
+   <institution>BAZ</institution>
+  </institutions>
+ </target_factors>
+ </decision_request>
+</event>
+EOL
   @translation = Babelicious::Mapper.translate(:concatenation, xml)
 end
 
