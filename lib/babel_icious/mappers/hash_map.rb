@@ -19,6 +19,7 @@ module Babelicious
     
     def value_from(source)
       hash = {}
+      element = ""
       @path_translator.inject_with_index(hash) do |hsh, element, index|
         return hsh[element.to_sym] if (index == @path_translator.last_index && index != 0)
         if hsh.empty?
@@ -27,6 +28,9 @@ module Babelicious
           hsh[element.to_sym]
         end
       end
+
+      rescue
+        raise "There was a problem extracting the value from your hash.  It seems to be missing element '#{element}'"
     end
 
     protected

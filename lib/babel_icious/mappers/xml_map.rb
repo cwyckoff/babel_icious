@@ -34,9 +34,8 @@ module Babelicious
     
     def map_output(xml_output, source_value)
       @index = @path_translator.last_index
-
       set_root(xml_output)
-      
+
       unless(update_node?(xml_output, source_value))
         populate_nodes(xml_output)
         map_from(xml_output, source_value)
@@ -71,7 +70,7 @@ module Babelicious
     def update_node?(xml_output, source_value)
       node = xml_output.find("/#{@path_translator.full_path}")
       unless(node.empty?)
-        node[0] << source_value.strip
+        node[0] << source_value.strip unless source_value.nil?
         return true
       end 
       false
