@@ -1,7 +1,7 @@
 spec = Gem::Specification.new do |s|
   s.name = 'babel_icious'
-  s.version = '0.0.4.9'
-  s.date = '2009-06-09'
+  s.version = '0.0.5.0'
+  s.date = '2009-06-17'
   s.summary = 'Babel_icious dynamic and scalable mapping tool'
   s.email = "github@cwyckoff.com"
   s.homepage = "http://github.com/cwyckoff/babel_icious"
