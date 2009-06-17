@@ -1,6 +1,8 @@
 module Babelicious
 
   class HashMap < BaseMap
+    attr_accessor :path_translator
+
     class << self
       
       def initial_target

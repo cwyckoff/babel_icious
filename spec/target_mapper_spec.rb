@@ -69,6 +69,68 @@ module Babelicious
       end 
 
     end
+
+    describe "#register_include" do
+
+      before(:each) do
+        Mapper.reset
+        @source_path_translator = mock("PathTranslator", :unshift => nil)
+        @target_path_translator = mock("PathTranslator", :unshift => nil)
+        @other_source = mock("XmlMap", :path_translator => @source_path_translator)
+        @other_target = mock("HashMap", :path_translator => @target_path_translator)
+        TargetMapper.stub!(:new).and_return(@other_target_mapper = mock("TargetMapper", :direction= => nil, :register_mapping => nil, 
+                                                                        :mappings => [[@other_source, @other_target], [@other_source, @other_target]]))
+        Mapper.config(:another_mapping) do |m|
+          m.direction :from => :xml, :to => :hash
+
+          m.map :to => "lets/do", :from => "another/mapping"
+        end 
+      end
+
+      context "missing mapping key" do
+
+        it "should raise an error" do
+          running { @target_mapper.register_include }.should raise_error(TargetMapperError)
+        end
+
+      end
+
+      context "missing included mapping" do
+
+        it "should raise an error" do
+          running { @target_mapper.register_include(:foo) }.should raise_error(TargetMapperError)
+        end
+
+      end
+
+      it "should retrieve mappings from included map definition" do
+        # expect
+        @other_target_mapper.should_receive(:mappings)
+
+        # when
+        @target_mapper.register_include(:another_mapping)
+      end
+
+      it "should add its own mappings to those from included map definition" do
+        # when
+        @target_mapper.register_include(:another_mapping)
+
+        # expect
+        @target_mapper.mappings.should == [[@source_element, @target_element], [@other_source, @other_target], [@other_source, @other_target]]
+      end
+
+      context "when included mapping is nested" do
+
+        it "should add its own " do
+          # expect
+          @target_path_translator.should_receive(:unshift)
+
+          # when
+          @target_mapper.register_include(:another_mapping, {:inside_of => "barf"})
+        end
+        
+      end
+    end
     
 
     describe "#register_mapping" do 

@@ -50,6 +50,16 @@ module Babelicious
       @mappings.last << target
     end
 
+    def register_include(map_definition=nil, opts={})
+      raise TargetMapperError, "A mapping definition key is required (e.g., m.include(:another_map))" if map_definition.nil?
+      raise TargetMapperError, "Mapping definition for #{map_definition} does not exist" unless (other_mapper = Mapper[map_definition.to_sym])
+
+      other_mapper.mappings.each do |m| 
+        m[1].path_translator.unshift(opts[:inside_of]) if opts[:inside_of]
+        @mappings << m
+      end 
+    end
+
     def register_mapping(opts={})
       raise TargetMapperError, "Both :from and :to keys must be set (e.g., {:from => \"foo/bar\", :to => \"bar/foo\")" unless (opts[:from] && opts[:to])
       target = MapFactory.target(@direction, opts)

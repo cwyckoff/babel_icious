@@ -95,6 +95,41 @@ Given /^a mapping exists with custom \.to method$/ do
   end 
 end
 
+Given /^a mapping exists with include$/ do
+  Babelicious::Mapper.config(:another_map) do |m|
+    m.direction :from => :hash, :to => :hash
+
+    m.map :from => "foo", :to => "zoo"
+    m.map :from => "bar", :to => "yoo"
+  end
+
+  Babelicious::Mapper.config(:include_another_map) do |m|
+    m.direction :from => :hash, :to => :hash
+
+    m.include :another_map
+    m.map :from => "baz", :to => "too"
+    m.map :from => "boo", :to => "soo/roo"
+  end
+end
+
+Given /^a mapping exists with nested include$/ do
+  Babelicious::Mapper.config(:another_map_with_nesting) do |m|
+    m.direction :from => :hash, :to => :hash
+
+    m.map :from => "foo", :to => "zoo"
+    m.map :from => "bar", :to => "yoo"
+  end
+
+  Babelicious::Mapper.config(:include_another_nested_map) do |m|
+    m.direction :from => :hash, :to => :hash
+
+    m.include :another_map, :inside_of => "foo"
+    m.map :from => "baz", :to => "foo/too"
+    m.map :from => "boo", :to => "foo/roo"
+  end
+end
+
+
 
 #
 ##
@@ -163,6 +198,16 @@ When /^the mapping with custom \.to method is translated$/ do
   @translation = Babelicious::Mapper.translate(:custom_to, xml)
 end
 
+When /^the mapping with include is translated$/ do
+  hash = {:foo => "Dave", :bar => "Brady", :baz => "Liz", :boo => "Brady"}
+  @translation = Babelicious::Mapper.translate(:include_another_map, hash)
+end
+
+When /^the mapping with nested include is translated$/ do
+  hash = {:foo => "Dave", :bar => "Brady", :baz => "Liz", :boo => "Brady"}
+  @translation = Babelicious::Mapper.translate(:include_another_nested_map, hash)
+end
+
 
 #
 ##
@@ -202,3 +247,12 @@ Then /^the target should be correctly processed for custom \.to conditions$/ do
 #  xml = "<foo><bar>baz</bar></foo>"
   @translation.should == { "value" => { "was" => { "baz" => "baz"}}}
 end
+
+Then /^the target should have mappings included from different map$/ do
+  @translation.should == {"zoo" => "Dave", "yoo" => "Brady", "too" => "Liz", "soo" => { "roo" => "Brady"}}
+end
+
+Then /^the target should have nested mappings included from different map$/ do
+  @translation.should == {"foo" => { "zoo" => "Dave", "yoo" => "Brady", "too" => "Liz", "roo" => "Brady"}}
+end
+

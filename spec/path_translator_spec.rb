@@ -38,6 +38,26 @@ module Babelicious
         @translator.last_index.should == 1
       end
     end
+
+    describe "#unshift" do
+      
+      it "should push element onto beginning of path array" do
+        # given
+        @translator.unshift("baz")
+
+        # expect
+        @translator.parsed_path.should == ["baz", "bar", "foo"]
+      end 
+
+      it "should add element to beginning of full path" do
+        # given
+        @translator.unshift("baz")
+
+        # expect
+        @translator.full_path.should == "baz/bar/foo"
+      end 
+
+    end
     
     describe "#size" do 
       

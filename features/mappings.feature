@@ -35,3 +35,13 @@ Scenario: Mapping with .from and .to methods
   Given a mapping exists with custom .to method
   When the mapping with custom .to method is translated
   Then the target should be correctly processed for custom .to conditions
+
+Scenario: Including mappings from another map definition
+  Given a mapping exists with include
+  When the mapping with include is translated
+  Then the target should have mappings included from different map 
+
+Scenario: Including mappings from another map definition with nesting
+  Given a mapping exists with nested include
+  When the mapping with nested include is translated
+  Then the target should have nested mappings included from different map 

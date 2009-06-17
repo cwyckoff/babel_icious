@@ -3,6 +3,7 @@ require 'xml'
 module Babelicious
   
   class XmlMap < BaseMap
+    attr_accessor :path_translator
     
     class << self
       

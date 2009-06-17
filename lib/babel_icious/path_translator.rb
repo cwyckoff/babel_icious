@@ -37,6 +37,11 @@ module Babelicious
       untranslated_path.gsub(/^\//, "").split("/")
     end
 
+    def unshift(element)
+      @parsed_path.unshift(element)
+      @full_path = "#{element}/" << @full_path
+    end 
+
   end
 
 end

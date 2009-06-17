@@ -6,6 +6,10 @@ module Babelicious
     
     class << self
       attr_reader :direction, :current_target_map_key
+
+      def [](key)
+        mappings[key.to_sym]
+      end 
       
       def config(key)
         raise MapperError, "A mapping for the key #{key} currently exists.  Are you sure you want to merge the mapping you are about to do with the existing mapping?" if mapping_already_exists?(key)
@@ -24,6 +28,11 @@ module Babelicious
 
       def from(from_str=nil)
         current_target_mapper.register_from(from_str)
+        self
+      end
+
+      def include(key, opts={})
+        current_target_mapper.register_include(key, opts)
         self
       end
       
@@ -63,7 +72,7 @@ module Babelicious
       private
       
       def current_target_mapper
-        mappings[@current_target_map_key] ||= (mappings[@current_target_map_key] = TargetMapper.new)
+        mappings[@current_target_map_key] ||= TargetMapper.new
       end
       
       def mapping_already_exists?(key)

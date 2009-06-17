@@ -87,6 +87,19 @@ module Babelicious
 
     end 
 
+
+    describe ".include" do
+
+      it "should delegate to target_mapper" do
+        # expect
+        @target_mapper.should_receive(:register_include).with(:another_mapping, {})
+
+        # given
+        Mapper.reset
+        Mapper.include(:another_mapping)
+      end
+      
+    end
     
     describe ".map" do 
       
@@ -208,6 +221,7 @@ module Babelicious
       end
       
     end
+
   end
   
 end
