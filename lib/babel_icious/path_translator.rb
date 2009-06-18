@@ -11,7 +11,11 @@ module Babelicious
     def [](index)
       @parsed_path[index]
     end
-    
+
+    def append(element)
+      "#{element}/#{@full_path}"
+    end 
+
     def each(&block)
       @parsed_path.each(&block)
     end
@@ -36,11 +40,6 @@ module Babelicious
     def translate(untranslated_path)
       untranslated_path.gsub(/^\//, "").split("/")
     end
-
-    def unshift(element)
-      @parsed_path.unshift(element)
-      @full_path = "#{element}/" << @full_path
-    end 
 
   end
 
