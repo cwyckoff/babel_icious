@@ -2,20 +2,23 @@ require 'xml/libxml'
 
 module BabeliciousNodeHacks
 
-  def concatenate_children(glue)
+  def to_a
     self.children.reject { }
-    res = self.children.inject('') do |a,b| 
+    res = self.children.inject([]) do |a,b| 
       unless b.content.strip.empty?
-        a << "#{b.content.strip}#{glue.strip}"
+        a << b.content.strip
       else 
         a
       end 
     end 
-    res.chop
+  end
+  
+  def concatenate_children(glue)
+    to_a.join("glue")
   end
   
   def child_content(child)
-    child_arr(child).first.content
+    child_arr(child).first.content unless child_arr(child).empty?
   end
 
   def child_name(child)
