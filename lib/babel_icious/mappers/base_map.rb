@@ -2,6 +2,14 @@ module Babelicious
   
   class BaseMap
     attr_reader :opts, :path_translator
+    
+    def initialize_copy(other)
+      @opts = {}
+      other.opts.each do |key, value|
+        @opts[key] = value.dup
+      end
+      @path_translator = other.path_translator.dup
+    end
 
     def map_from(output, source_value)
       if map_condition?

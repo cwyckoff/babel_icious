@@ -55,8 +55,12 @@ module Babelicious
       raise TargetMapperError, "Mapping definition for #{map_definition} does not exist" unless (other_mapper = Mapper[map_definition.to_sym])
 
       other_mapper.mappings.each do |m|
-        source = MapFactory.source(@direction, m[0].opts)
-        target = MapFactory.target(@direction, m[1].opts.merge(:to => to_path(m, opts)))
+        source = m[0].dup
+        target = m[1].dup
+        if opts[:inside_of]
+          source.path_translator.unshift(opts[:inside_of])
+          target.path_translator.unshift(opts[:inside_of])
+        end 
         
         @mappings << [source, target]
       end 
@@ -85,11 +89,11 @@ module Babelicious
       end 
     end 
 
-    def to_path(mappings, opts)
+    def to_path(mapping, opts)
       if opts[:inside_of]
-        to_path = mappings[1].path_translator.append(opts[:inside_of])
+        to_path = mapping.path_translator.append(opts[:inside_of])
       else
-        to_path = mappings[1].path_translator.full_path
+        to_path = mapping.path_translator.full_path
       end 
     end 
   end

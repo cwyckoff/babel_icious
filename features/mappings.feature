@@ -42,6 +42,6 @@ Scenario: Including mappings from another map definition
   Then the target should have mappings included from different map 
 
 Scenario: Including mappings from another map definition with nesting
-  Given a mapping exists with nested include
+  Given a contact mapping exists with nested include
   When the mapping with nested include is translated
   Then the target should have nested mappings included from different map 

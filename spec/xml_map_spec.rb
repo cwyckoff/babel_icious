@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
+require File.expand_path(File.dirname(__FILE__) + "/base_map_spec")
 
 module Babelicious
   
@@ -8,8 +9,10 @@ module Babelicious
       @node = mock("Xml::Document::Node", :content => "baz", :children => mock("Xml::Document::Node", :size => 1))
       @source = mock("Xml::Document", :find => [@node])
       @path_translator = PathTranslator.new("foo/bar")
-      @xml_map = XmlMap.new(@path_translator)
+      @xml_map = @strategy = XmlMap.new(@path_translator)
     end
+
+    it_should_behave_like "an implementation of a mapping strategy"
 
     describe ".initial_target" do 
       

@@ -7,6 +7,11 @@ module Babelicious
     def initialize(untranslated_path)
       set_path(untranslated_path)
     end
+    
+    def initialize_copy(other)
+      @full_path = other.full_path.dup
+      @parsed_path = other.parsed_path.dup
+    end
 
     def [](index)
       @parsed_path[index]
@@ -40,6 +45,11 @@ module Babelicious
     def translate(untranslated_path)
       untranslated_path.gsub(/^\//, "").split("/")
     end
+
+    def unshift(element)
+      @parsed_path.unshift(element)
+      @full_path = "#{element}/" << @full_path
+    end 
 
   end
 

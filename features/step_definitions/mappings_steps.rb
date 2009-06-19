@@ -112,20 +112,19 @@ Given /^a mapping exists with include$/ do
   end
 end
 
-Given /^a mapping exists with nested include$/ do
-  Babelicious::Mapper.config(:another_map_with_nesting) do |m|
+Given /^a contact mapping exists with nested include$/ do
+  Babelicious::Mapper.config(:a_sample_person) do |m|
     m.direction :from => :hash, :to => :hash
 
-    m.map :from => "foo", :to => "zoo"
-    m.map :from => "bar", :to => "yoo"
+    m.map :from => "name/first", :to => "first_name"
+    m.map :from => "name/last", :to => "last_name"
   end
 
-  Babelicious::Mapper.config(:include_another_nested_map) do |m|
+  Babelicious::Mapper.config(:a_sample_contact) do |m|
     m.direction :from => :hash, :to => :hash
 
-    m.include :another_map, :inside_of => "foo"
-    m.map :from => "baz", :to => "foo/too"
-    m.map :from => "boo", :to => "foo/roo"
+    m.include :a_sample_person, :inside_of => "contact"
+    m.map :from => "contact/phone/home", :to => "contact/home_phone"
   end
 end
 
@@ -204,8 +203,8 @@ When /^the mapping with include is translated$/ do
 end
 
 When /^the mapping with nested include is translated$/ do
-  hash = {:foo => "Dave", :bar => "Brady", :baz => "Liz", :boo => "Brady"}
-  @translation = Babelicious::Mapper.translate(:include_another_nested_map, hash)
+  hash = {:contact => {:name => {:first => "Dave", :last => "Brady"}, :phone => {:home => "1231231234"}}}
+  @translation = Babelicious::Mapper.translate(:a_sample_contact, hash)
 end
 
 
@@ -253,6 +252,6 @@ Then /^the target should have mappings included from different map$/ do
 end
 
 Then /^the target should have nested mappings included from different map$/ do
-  @translation.should == {"foo" => { "zoo" => "Dave", "yoo" => "Brady", "too" => "Liz", "roo" => "Brady"}}
+  @translation.should == {"contact" => { "first_name" => "Dave", "last_name" => "Brady", "home_phone" => "1231231234"}}
 end
 

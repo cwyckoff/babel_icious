@@ -92,5 +92,15 @@ module Babelicious
 
     end
     
+    describe "#dup" do
+      
+      it "deep dups all of the attributes" do
+        dupd = @translator.dup
+        dupd.full_path.object_id.should_not == @translator.full_path.object_id
+        dupd.parsed_path.object_id.should_not == @translator.parsed_path.object_id
+      end
+      
+    end
+    
   end 
 end

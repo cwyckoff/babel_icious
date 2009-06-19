@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
+require File.expand_path(File.dirname(__FILE__) + "/base_map_spec")
 
 module Babelicious
 
@@ -18,7 +19,14 @@ module Babelicious
         HashMap.filter_source(source).should == source
       end
     end
+
+    before(:each) do
+      @path_translator = mock("PathTranslator", :last_index => 0)
+      @strategy = HashMap.new(@path_translator)
+    end
     
+    it_should_behave_like "an implementation of a mapping strategy"
+
     describe "#map_from" do 
 
       before(:each) do
