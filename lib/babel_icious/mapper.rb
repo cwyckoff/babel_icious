@@ -5,7 +5,7 @@ module Babelicious
   class Mapper
     
     class << self
-      attr_reader :direction, :current_target_map_key
+      attr_reader :direction, :current_map_definition_key
 
       def [](key)
         mappings[key.to_sym]
@@ -14,30 +14,30 @@ module Babelicious
       def config(key)
         raise MapperError, "A mapping for the key #{key} currently exists.  Are you sure you want to merge the mapping you are about to do with the existing mapping?" if mapping_already_exists?(key)
 
-        @current_target_map_key = key
+        @current_map_definition_key = key
         yield self
       end
 
       def customize(&block)
-        current_target_mapper.register_customized(&block)
+        current_map_definition.register_customized(&block)
       end
 
       def direction(dir={})
-        current_target_mapper.direction = @direction = dir
+        current_map_definition.direction = @direction = dir
       end
 
       def from(from_str=nil)
-        current_target_mapper.register_from(from_str)
+        current_map_definition.register_from(from_str)
         self
       end
 
       def include(key, opts={})
-        current_target_mapper.register_include(key, opts)
+        current_map_definition.register_include(key, opts)
         self
       end
       
       def map(opts={})
-        current_target_mapper.register_mapping(opts)
+        current_map_definition.register_mapping(opts)
         self
       end
 
@@ -50,7 +50,7 @@ module Babelicious
       end
 
       def to(&block)
-        current_target_mapper.register_to(&block)
+        current_map_definition.register_to(&block)
         self
       end
       
@@ -61,18 +61,18 @@ module Babelicious
       end
       
       def when(&block)
-        current_target_mapper.register_condition(:when, nil, &block)
+        current_map_definition.register_condition(:when, nil, &block)
       end
 
       def unless(condition=nil, &block)
-        current_target_mapper.register_condition(:unless, condition, &block)
+        current_map_definition.register_condition(:unless, condition, &block)
         self
       end
       
       private
       
-      def current_target_mapper
-        mappings[@current_target_map_key] ||= TargetMapper.new
+      def current_map_definition
+        mappings[@current_map_definition_key] ||= MapDefinition.new
       end
       
       def mapping_already_exists?(key)
