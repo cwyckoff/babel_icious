@@ -17,10 +17,6 @@ module Babelicious
       @parsed_path[index]
     end
 
-    def append(element)
-      "#{element}/#{@full_path}"
-    end 
-
     def each(&block)
       @parsed_path.each(&block)
     end

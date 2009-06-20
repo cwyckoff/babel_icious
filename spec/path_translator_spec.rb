@@ -84,14 +84,6 @@ module Babelicious
       end
     end
 
-    describe "#append" do
-      
-      it "should return modified full path with argument appended to beginning of full path" do
-        @translator.append("baz").should == "baz/bar/foo"
-      end 
-
-    end
-    
     describe "#dup" do
       
       it "deep dups all of the attributes" do
