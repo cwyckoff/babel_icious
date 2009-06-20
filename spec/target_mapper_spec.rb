@@ -75,17 +75,13 @@ module Babelicious
 
       before(:each) do
         Mapper.reset
-        @source_path_translator = mock("PathTranslator", :full_path => nil)
-        @target_path_translator = mock("PathTranslator", :full_path => nil, :append => "")
-        @other_source = mock("XmlMap", :path_translator => @source_path_translator, :opts => {:to => "foo", :from => "bar"})
-        @other_target = mock("HashMap", :path_translator => @target_path_translator, :opts => {:to => "foo", :from => "bar"})
-        TargetMapper.stub!(:new).and_return(@other_target_mapper = mock("TargetMapper", :direction= => nil, :register_mapping => nil, 
-                                                                        :mappings => [MapRule.new(@other_source, @other_target), MapRule.new(@other_source, @other_target)]))
-        Mapper.config(:another_mapping) do |m|
-          m.direction :from => :xml, :to => :hash
-
-          m.map :to => "lets/do", :from => "another/mapping"
-        end 
+        @source_path_translator = mock("PathTranslator")
+        @target_path_translator = mock("PathTranslator")
+        @source_element = mock("HashMap", :dup => (@dupd_source = mock("HashMap", :path_translator => @source_path_translator)))
+        @target_element = mock("HashMap", :dup => (@dupd_target = mock("HashMap", :path_translator => @target_path_translator)))
+        @other_map_rule = mock("MapRule", :source => @source_element, :target => @target_element)
+        @other_target_mapper = mock("TargetMapper", :direction= => nil, :register_mapping => nil, :mappings => [@other_map_rule])
+        Mapper.mappings[:another_mapping] = @other_target_mapper
       end
 
       context "missing mapping key" do
@@ -103,7 +99,7 @@ module Babelicious
         end
 
       end
-
+      
       it "should retrieve mappings from included map definition" do
         # expect
         @other_target_mapper.should_receive(:mappings)
@@ -117,14 +113,16 @@ module Babelicious
         @target_mapper.register_include(:another_mapping)
 
         # expect
-        @target_mapper.mappings.should == [[@source_element, @target_element], [other_source, other_target], [other_source, other_target]]
+        @target_mapper.mappings.last.source.should == @dupd_source
+        @target_mapper.mappings.last.target.should == @dupd_target
       end
 
       context "when included mapping is nested" do
 
         it "should add its own " do
           # expect
-          @target_path_translator.should_receive(:append).with("barf")
+          @dupd_source.path_translator.should_receive(:unshift).with("barf")
+          @dupd_target.path_translator.should_receive(:unshift).with("barf")
 
           # when
           @target_mapper.register_include(:another_mapping, {:inside_of => "barf"})
