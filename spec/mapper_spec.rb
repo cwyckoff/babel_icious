@@ -5,7 +5,7 @@ module Babelicious
   describe "Mapper" do
 
     before(:each) do 
-      TargetMapper.stub!(:new).and_return(@target_mapper = mock("TargetMapper", :register_mapping => nil, :direction= => nil))
+      MapDefinition.stub!(:new).and_return(@map_definition = mock("MapDefinition", :register_mapping => nil, :direction= => nil))
     end
     
     describe ".config" do
@@ -23,7 +23,7 @@ module Babelicious
         Mapper.config(:foo) {}
         
         # expect
-        Mapper.current_target_map_key.should == :foo
+        Mapper.current_map_definition_key.should == :foo
       end
       
       describe "when a mapping key already exists" do 
@@ -48,7 +48,7 @@ module Babelicious
       
       it "should delegate it to target mapper" do 
         # expect
-        @target_mapper.should_receive(:register_customized) #.with(:when, an_instance_of(Proc)).and_return(@when_conditions)
+        @map_definition.should_receive(:register_customized) #.with(:when, an_instance_of(Proc)).and_return(@when_conditions)
         
         # given
         Mapper.map({:to => "bar/foo", :from => "foo/bar"}).customize do |value|
@@ -63,7 +63,7 @@ module Babelicious
       
       it "should set direction of the mapping" do 
         # expect
-        @target_mapper.should_receive(:direction=).with({:from => :xml, :to => :hash})
+        @map_definition.should_receive(:direction=).with({:from => :xml, :to => :hash})
 
         # given
         Mapper.reset
@@ -78,7 +78,7 @@ module Babelicious
 
       it "should delegate source path to target mapper" do 
         # expect
-        @target_mapper.should_receive(:register_from).with("foo/bar")
+        @map_definition.should_receive(:register_from).with("foo/bar")
 
         # given
         Mapper.reset
@@ -90,9 +90,9 @@ module Babelicious
 
     describe ".include" do
 
-      it "should delegate to target_mapper" do
+      it "should delegate to map_definition" do
         # expect
-        @target_mapper.should_receive(:register_include).with(:another_mapping, {})
+        @map_definition.should_receive(:register_include).with(:another_mapping, {})
 
         # given
         Mapper.reset
@@ -111,7 +111,7 @@ module Babelicious
       
       it "should register mappings" do 
         # expect
-        @target_mapper.should_receive(:register_mapping).with(@opts)
+        @map_definition.should_receive(:register_mapping).with(@opts)
 
         # given
         Mapper.map @opts
@@ -142,7 +142,7 @@ module Babelicious
 
       it "should delegate target block to target mapper" do 
         # expect
-        @target_mapper.should_receive(:register_to) #.with(kind_of(Proc))
+        @map_definition.should_receive(:register_to) #.with(kind_of(Proc))
 
         # given
         Mapper.reset
@@ -170,7 +170,7 @@ module Babelicious
 
       it "should map target elements" do 
         # expect
-        @target_mapper.should_receive(:translate).with(@xml).and_return({})
+        @map_definition.should_receive(:translate).with(@xml).and_return({})
 
         # given
         Mapper.translate(:foo, @xml)
@@ -198,7 +198,7 @@ module Babelicious
 
         it "should delegate it to target mapper" do 
           # expect
-          @target_mapper.should_receive(:register_condition) #.with(:when, an_instance_of(Proc)).and_return(@when_conditions)
+          @map_definition.should_receive(:register_condition) #.with(:when, an_instance_of(Proc)).and_return(@when_conditions)
           
           # given
           Mapper.map(@opts).when do |value|
@@ -212,7 +212,7 @@ module Babelicious
 
         it "should delegate it to target mapper" do 
           # expect
-          @target_mapper.should_receive(:register_condition).with(:unless, :nil) #.with(:when, an_instance_of(Proc)).and_return(@when_conditions)
+          @map_definition.should_receive(:register_condition).with(:unless, :nil) #.with(:when, an_instance_of(Proc)).and_return(@when_conditions)
           
           # given
           Mapper.map(@opts).unless(:nil)

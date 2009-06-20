@@ -1,8 +1,8 @@
-class TargetMapperError < Exception; end
+class MapDefinitionError < Exception; end
 
 module Babelicious
 
-  class TargetMapper
+  class MapDefinition
     attr_reader :mappings, :direction
     
     def initialize
@@ -10,8 +10,8 @@ module Babelicious
     end
 
     def direction=(dir)
-      raise TargetMapperError, "Direction must be a hash" unless dir.is_a?(Hash)
-      raise TargetMapperError, "Both :from and :to keys must be set (e.g., {:from => :xml, :to => :hash}" unless (dir[:from] && dir[:to])
+      raise MapDefinitionError, "Direction must be a hash" unless dir.is_a?(Hash)
+      raise MapDefinitionError, "Both :from and :to keys must be set (e.g., {:from => :xml, :to => :hash}" unless (dir[:from] && dir[:to])
 
       @direction = dir
     end
@@ -37,22 +37,22 @@ module Babelicious
     end
     
     def register_from(from_str)
-      raise TargetMapperError, "Please specify a source mapping" if from_str.nil?
+      raise MapDefinitionError, "Please specify a source mapping" if from_str.nil?
       source = MapFactory.source(@direction, {:from => from_str})
 
       @mappings << MapRule.new(source)
     end
 
     def register_to(&block)
-      raise TargetMapperError, "You must call the .from method before customizing the .to method (e.g., m.from(\"foo\").to {|value| ...}" unless @mappings.last
+      raise MapDefinitionError, "You must call the .from method before customizing the .to method (e.g., m.from(\"foo\").to {|value| ...}" unless @mappings.last
 
       target = MapFactory.target(@direction, {:to => '', :to_proc => block})
       @mappings.last.target = target
     end
 
     def register_include(map_definition=nil, opts={})
-      raise TargetMapperError, "A mapping definition key is required (e.g., m.include(:another_map))" if map_definition.nil?
-      raise TargetMapperError, "Mapping definition for #{map_definition} does not exist" unless (other_mapper = Mapper[map_definition.to_sym])
+      raise MapDefinitionError, "A mapping definition key is required (e.g., m.include(:another_map))" if map_definition.nil?
+      raise MapDefinitionError, "Mapping definition for #{map_definition} does not exist" unless (other_mapper = Mapper[map_definition.to_sym])
 
       other_mapper.mappings.each do |m|
         source = m.source.dup
@@ -68,7 +68,7 @@ module Babelicious
     end
 
     def register_mapping(opts={})
-      raise TargetMapperError, "Both :from and :to keys must be set (e.g., {:from => \"foo/bar\", :to => \"bar/foo\")" unless (opts[:from] && opts[:to])
+      raise MapDefinitionError, "Both :from and :to keys must be set (e.g., {:from => \"foo/bar\", :to => \"bar/foo\")" unless (opts[:from] && opts[:to])
       
       @mappings << MapRule.new(MapFactory.source(@direction, opts), MapFactory.target(@direction, opts))
     end
