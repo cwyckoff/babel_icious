@@ -14,7 +14,7 @@ module BabeliciousNodeHacks
   end
   
   def concatenate_children(glue)
-    to_a.join("glue")
+    to_a.join(glue)
   end
   
   def child_content(child)

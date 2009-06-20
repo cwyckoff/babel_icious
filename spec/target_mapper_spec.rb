@@ -52,13 +52,14 @@ module Babelicious
 
       it "should add source to mappings array" do 
         # given
+        MapRule.stub!(:new).and_return(map_rule = MapRule.new(@source_element, @target_element))
         @target_mapper.reset
 
         # when
         @target_mapper.register_from("foo/bar")
 
         # expect
-        @target_mapper.mappings.should == [[@source_element]]
+        @target_mapper.mappings.should == [map_rule]
       end 
 
       context "when argument is nil" do 
@@ -79,7 +80,7 @@ module Babelicious
         @other_source = mock("XmlMap", :path_translator => @source_path_translator, :opts => {:to => "foo", :from => "bar"})
         @other_target = mock("HashMap", :path_translator => @target_path_translator, :opts => {:to => "foo", :from => "bar"})
         TargetMapper.stub!(:new).and_return(@other_target_mapper = mock("TargetMapper", :direction= => nil, :register_mapping => nil, 
-                                                                        :mappings => [[@other_source, @other_target], [@other_source, @other_target]]))
+                                                                        :mappings => [MapRule.new(@other_source, @other_target), MapRule.new(@other_source, @other_target)]))
         Mapper.config(:another_mapping) do |m|
           m.direction :from => :xml, :to => :hash
 
@@ -112,10 +113,6 @@ module Babelicious
       end
 
       it "should add its own mappings to those from included map definition" do
-        # given
-        MapFactory.stub!(:source).and_return(other_source = mock("XmlMap"))
-        MapFactory.stub!(:target).and_return(other_target = mock("HashMap"))
-        
         # when
         @target_mapper.register_include(:another_mapping)
 
@@ -140,16 +137,25 @@ module Babelicious
     describe "#register_mapping" do 
 
       def do_process
+        @source_element.stub!(:class).and_return(@xml_map_klass = mock("XmlMapKlass", :filter_source => @xml))
         @target_mapper.reset
         @target_mapper.direction = {:from => :xml, :to => :hash}
         @target_mapper.register_mapping(@opts)
-        @source_element.stub!(:class).and_return(@xml_map_klass = mock("XmlMapKlass", :filter_source => @xml))
       end
       
       it "should register target or source mapping" do 
-        during_process { 
-          @target_mapper.mappings.should == [[@source_element, @target_element]]
-        }
+        # given
+        @source_element.stub!(:class).and_return(mock("XmlMapKlass", :filter_source => @xml))
+        @target_mapper.reset
+        @target_mapper.direction = {:from => :xml, :to => :hash}
+        map_rule = MapRule.new(@source_element, @target_element)
+        MapRule.stub!(:new).and_return(map_rule)
+
+        # when
+        @target_mapper.register_mapping(@opts)
+
+        # expect
+        @target_mapper.mappings.should == [map_rule]
       end
 
       describe "setting target" do 
@@ -207,12 +213,13 @@ module Babelicious
 
       it "should add source to mappings array" do 
         # given
+        map_rule = MapRule.new(@source_element)
         @target_mapper.reset
-        @target_mapper.mappings << [@source_element]
+        @target_mapper.mappings << map_rule
         @target_mapper.register_to
 
         # expect
-        @target_mapper.mappings.should == [[@source_element, @target_element]]
+        @target_mapper.mappings.should == [map_rule]
       end 
 
       context "if .from has not been set before calling .to" do 

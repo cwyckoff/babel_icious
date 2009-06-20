@@ -29,6 +29,9 @@ module Babelicious
           return node.content
         end
       end
+
+      rescue
+        raise "There was a problem extracting the value from your xml at mapping '#{@path_translator.full_path}'"
     end
 
     protected
