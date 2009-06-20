@@ -28,6 +28,10 @@ module Babelicious
     def last
       @parsed_path.last
     end
+
+    def prepare_path(path)
+      path.gsub(/^\//, "").gsub(/\/$/, "")
+    end 
     
     def set_path(untranslated_path)
       @full_path = untranslated_path
@@ -38,13 +42,13 @@ module Babelicious
       @parsed_path.size
     end
     
-    def translate(untranslated_path)
-      untranslated_path.gsub(/^\//, "").split("/")
+    def translate(path)
+      prepare_path(path).split("/")
     end
 
-    def unshift(element)
-      @parsed_path.unshift(element)
-      @full_path = "#{element}/" << @full_path
+    def unshift(path)
+      @parsed_path.unshift(translate(path)).flatten!
+      @full_path = "#{prepare_path(path)}/" << @full_path
     end 
 
   end

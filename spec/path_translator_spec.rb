@@ -14,6 +14,16 @@ module Babelicious
         @translator[1].should == "foo"
       end
     end
+
+    describe "#dup" do
+      
+      it "deep dups all of the attributes" do
+        dupd = @translator.dup
+        dupd.full_path.object_id.should_not == @translator.full_path.object_id
+        dupd.parsed_path.object_id.should_not == @translator.parsed_path.object_id
+      end
+      
+    end
     
     describe "#each" do 
 
@@ -37,6 +47,18 @@ module Babelicious
       it "should return index of last element in parsed path array" do 
         @translator.last_index.should == 1
       end
+    end
+
+    describe "#prepare_path" do
+
+      it "should strip opening slashes" do
+        @translator.prepare_path("/foo/bar").should == "foo/bar"
+      end
+
+      it "should strip trailing slashes" do
+        @translator.prepare_path("foo/bar/").should == "foo/bar"
+      end
+
     end
 
     describe "#size" do 
@@ -102,17 +124,18 @@ module Babelicious
         @translator.parsed_path.should == ["baz", "bar", "foo"]
       end 
 
-    end
-    
-    describe "#dup" do
-      
-      it "deep dups all of the attributes" do
-        dupd = @translator.dup
-        dupd.full_path.object_id.should_not == @translator.full_path.object_id
-        dupd.parsed_path.object_id.should_not == @translator.parsed_path.object_id
+      context "if multiple namespaces provided" do
+
+        it "should split those namespaces when it pushes them onto parsed path array" do
+          # when
+          @translator.unshift("baz/boo")
+
+          # expect
+          @translator.parsed_path.should == ["baz", "boo", "bar", "foo"]
+        end
+        
       end
-      
+
     end
-    
   end 
 end
