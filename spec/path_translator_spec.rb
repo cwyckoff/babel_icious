@@ -84,6 +84,26 @@ module Babelicious
       end
     end
 
+    describe "#unshift" do
+      
+      it "should appended element to beginning of full path" do
+        # when
+        @translator.unshift("baz")
+
+        # expect
+        @translator.full_path.should == "baz/bar/foo"
+      end 
+
+      it "should push element to beginning of parsed path array" do
+        # when
+        @translator.unshift("baz")
+
+        # expect
+        @translator.parsed_path.should == ["baz", "bar", "foo"]
+      end 
+
+    end
+    
     describe "#dup" do
       
       it "deep dups all of the attributes" do
