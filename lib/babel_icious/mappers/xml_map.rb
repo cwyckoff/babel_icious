@@ -44,9 +44,24 @@ module Babelicious
         populate_nodes(xml_output)
         map_from(xml_output, source_value)
       end 
+
+      rescue Exception => e
+        raise "There was a problem mapping the xml output for mapping '#{@path_translator.full_path}' with source value #{source_value}"
     end
     
     private
+
+    def map_source_value(source_value)
+      if(@customized_map)
+        @customized_map.call(source_value)
+      else 
+        if(source_value.is_a?(String))
+          source_value.strip
+        else
+          source_value
+        end 
+      end 
+    end
 
     def populate_nodes(xml_output)
       return if @index == 0
@@ -74,10 +89,9 @@ module Babelicious
     def update_node?(xml_output, source_value)
       node = xml_output.find("/#{@path_translator.full_path}")
       unless(node.empty?)
-        node[0] << source_value.strip unless source_value.nil?
+        node[0] << map_source_value(source_value) # source_value.strip unless source_value.nil?
         return true
       end 
-      false
     end
   end
 

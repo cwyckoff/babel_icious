@@ -67,6 +67,55 @@ Given /^a mapping exists with concatenation$/ do
   end
 end
 
+Given /^a customized mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |source, target, tag|
+  @mapping_tag = tag.to_sym
+  @direction = {:from => source.to_sym, :to => target.to_sym}
+  
+  case @direction
+  when {:from => :xml, :to => :hash}
+    Babelicious::Mapper.config(@mapping_tag.to_sym) do |m|
+      m.direction @direction
+      
+      m.map(:from => "event/progress/statuses", :to => "event/new_update_status_code").customize do |node|
+        res = []
+        node.elements.map { |nd| res << {"name" => nd.child_content("code"), "text" => nd.child_content("message")} }
+        res
+      end
+    end 
+  when {:from => :hash, :to => :xml}
+    Babelicious::Mapper.config(@mapping_tag.to_sym) do |m|
+      m.direction @direction
+      
+      m.map(:from => "rankings", :to => "event/response").customize do |val|
+        node = new_node("rankings")
+        val.each do |r|
+
+          ranking = new_node("ranking")
+          rank = new_node("rank") << r["ranking"]["rank"]
+          value = new_node("value") << r["ranking"]["value"]
+          rules = new_node("rules")
+
+          r["ranking"]["rules"].each do |rl| 
+            rule = new_node("rule") << rl["rule"]
+            rules << rule
+          end 
+
+          potential_event = new_node("potential_event")
+          r["ranking"]["potential_event"].each do |e| 
+            institution = new_node("institutions") << e["institutions"]
+            potential_event << institution
+          end 
+
+          node << ranking.add(rank, value, rules, potential_event)
+        end
+
+        node
+      end
+    end 
+  end 
+
+end
+
 Given /^a mapping exists with a customized block$/ do
   Babelicious::Mapper.config(:customized) do |m|
     m.direction :from => :xml, :to => :hash
@@ -188,8 +237,52 @@ end
 When /^the customized mapping is translated$/ do
 #  xml = '<foo><bar>baz</bar><cuk>coo</cuk></foo>'
 #  xml = '<statuses><status><code>Abandoned</code><message>bad phone</message></status><status><code>Rejected</code><message>bad word</message></status></statuses>'
-  xml = '<event><progress><statuses><status><code>Abandoned</code><message>bad phone</message></status><status><code>Rejected</code><message>bad word</message></status></statuses></progress></event>'
-  @translation = Babelicious::Mapper.translate(:customized, xml)
+  case @direction
+  when {:from => :xml, :to => :hash}
+    xml = <<-EOL
+<event>
+ <progress>
+  <statuses>
+   <status>
+    <code>Abandoned</code>
+    <message>bad phone</message>
+   </status>
+   <status>
+    <code>Rejected</code>
+    <message>bad word</message>
+   </status>
+  </statuses>
+ </progress>
+</event>
+EOL
+    @translation = Babelicious::Mapper.translate(@mapping_tag.to_sym, xml)
+  when {:from => :hash, :to => :xml}
+    hash = {"rankings"=>
+      [
+       {"ranking"=>{
+           "rules"=> [
+                      {"rule"=>"pace_adjusted_revenue"}
+                     ], 
+           "rank"=>1, 
+           "value"=>0.0, 
+           "potential_event"=>[{"institutions"=>"AcmeU"}]
+         }
+       },
+       {"ranking"=> {"rules"=>
+           [
+            {"rule"=>"clipped"}
+           ], 
+           "rank"=>2, 
+           "value"=>0.0, 
+           "potential_event"=>[{"institutions"=>"BraUn"}]
+         }
+       }
+      ],
+      "decision_point"=>"LMP_Insti"
+    }
+
+    @translation = Babelicious::Mapper.translate(@mapping_tag.to_sym, hash)
+  end 
 end
 
 When /^the mapping with custom \.to method is translated$/ do
@@ -237,7 +330,43 @@ Then /^the target should be properly concatenated$/ do
 end
 
 Then /^the customized target should be correctly processed$/ do
-  @translation.should == {"event"=>{"new_update_status_code"=>[{"name"=>"Abandoned", "text"=>"bad phone"}, {"name"=>"Rejected", "text"=>"bad word"}]}}
+  case @direction
+  when {:from => :xml, :to => :hash}
+    translation = {"event"=>{"new_update_status_code"=>[{"name"=>"Abandoned", "text"=>"bad phone"}, {"name"=>"Rejected", "text"=>"bad word"}]}}
+    @translation.should == translation
+  when {:from => :hash, :to => :xml}
+ translation = <<-EOL
+<?xml version="1.0" encoding="UTF-8"?>
+<event>
+  <response>
+    <rankings>
+      <ranking>
+        <rank>1</rank>
+        <value>0.0</value>
+        <rules>
+          <rule>pace_adjusted_revenue</rule>
+        </rules>
+        <potential_event>
+          <institutions>AcmeU</institutions>
+        </potential_event>
+      </ranking>
+      <ranking>
+        <rank>2</rank>
+        <value>0.0</value>
+        <rules>
+          <rule>clipped</rule>
+        </rules>
+        <potential_event>
+          <institutions>BraUn</institutions>
+        </potential_event>
+      </ranking>
+    </rankings>
+  </response>
+</event>
+EOL
+    @translation.to_s.should == translation
+  end 
+
 #  @translation.should == {"new_update_status_code"=>[{"name"=>"Abandoned", "text"=>"bad phone"}, {"name"=>"Rejected", "text"=>"bad word"}]}
 #  @translation.should == {"boo" => [{"bum" => "baz", "dum" => "coo"}]}
 end

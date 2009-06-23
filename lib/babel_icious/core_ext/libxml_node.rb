@@ -1,18 +1,16 @@
 require 'xml/libxml'
 
+def new_node(name)
+  XML::Node.new(name)
+end 
+
 module BabeliciousNodeHacks
 
-  def to_a
-    self.children.reject { }
-    res = self.children.inject([]) do |a,b| 
-      unless b.content.strip.empty?
-        a << b.content.strip
-      else 
-        a
-      end 
-    end 
-  end
-  
+  def add(*nodes)
+    nodes.each { |n| self << n }
+    self
+  end 
+
   def concatenate_children(glue)
     to_a.join(glue)
   end
@@ -29,6 +27,17 @@ module BabeliciousNodeHacks
     e = []
     self.each_element {|elem| e << elem}
     e
+  end
+  
+  def to_a
+    self.children.reject { }
+    res = self.children.inject([]) do |a,b| 
+      unless b.content.strip.empty?
+        a << b.content.strip
+      else 
+        a
+      end 
+    end 
   end
   
   private

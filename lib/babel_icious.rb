@@ -14,3 +14,4 @@ require "babel_icious/mappers/xml_map"
 require "babel_icious/mappers/hash_map"
 require "babel_icious/mapper"
 require "babel_icious/map_condition"
+

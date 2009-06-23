@@ -21,10 +21,15 @@ Scenario Outline: Mapping with conditions
   | unless	|
   | when	|
 
-Scenario: Mapping hash with custom block
-  Given a mapping exists with a customized block
+Scenario Outline: Mapping hash with custom block
+  Given a customized mapping exists for '<Source>' to '<Target>' with tag '<MappingTag>'
   When the customized mapping is translated
   Then the customized target should be correctly processed 
+
+  Examples:
+  | Source | Target | MappingTag |
+  | hash   | xml    | custom_hash|
+  | xml    | hash   | custom_xml |
 
  Scenario: Mapping from xml with concatenation
   Given a mapping exists with concatenation
