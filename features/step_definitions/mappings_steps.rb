@@ -86,30 +86,38 @@ Given /^a customized mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |s
     Babelicious::Mapper.config(@mapping_tag.to_sym) do |m|
       m.direction @direction
       
-      m.map(:from => "rankings", :to => "event/response").customize do |val|
-        node = new_node("rankings")
-        val.each do |r|
+      m.map(:from => "event/rankings", :to => "event/response").customize do |val|
+        node = new_node("rankings") do |rankings|
 
-          ranking = new_node("ranking")
-          rank = new_node("rank") << r["ranking"]["rank"]
-          value = new_node("value") << r["ranking"]["value"]
-          rules = new_node("rules")
+          val.each do |rnk|
+            rankings << new_node("ranking") do |ranking|
 
-          r["ranking"]["rules"].each do |rl| 
-            rule = new_node("rule") << rl["rule"]
-            rules << rule
+              ranking << new_node("rank") do |rank|
+                rank << rnk["ranking"]["rank"]
+              end 
+
+              ranking << new_node("value") do |value|
+                value << rnk["ranking"]["value"]
+              end 
+
+              ranking << new_node("rules") do |rules|
+                rnk["ranking"]["rules"].each do |rl| 
+                  rule = new_node("rule") << rl["rule"]
+                  rules << rule
+                end 
+              end 
+
+              ranking << new_node("potential_event") do |potential_event|
+                rnk["ranking"]["potential_event"].each do |e| 
+                  institution = new_node("institutions") << e["institutions"]
+                  potential_event << institution
+                end 
+              end 
+
+            end 
+
           end 
-
-          potential_event = new_node("potential_event")
-          r["ranking"]["potential_event"].each do |e| 
-            institution = new_node("institutions") << e["institutions"]
-            potential_event << institution
-          end 
-
-          node << ranking.add(rank, value, rules, potential_event)
-        end
-
-        node
+        end 
       end
     end 
   end 
@@ -257,30 +265,32 @@ When /^the customized mapping is translated$/ do
 EOL
     @translation = Babelicious::Mapper.translate(@mapping_tag.to_sym, xml)
   when {:from => :hash, :to => :xml}
-    hash = {"rankings"=>
-      [
-       {"ranking"=>{
-           "rules"=> [
-                      {"rule"=>"pace_adjusted_revenue"}
-                     ], 
-           "rank"=>1, 
-           "value"=>0.0, 
-           "potential_event"=>[{"institutions"=>"AcmeU"}]
+    hash = 
+    { "event" => 
+      {"rankings"=>
+        [
+         {"ranking"=>{
+             "rules"=> [
+                        {"rule"=>"pace_adjusted_revenue"}
+                       ], 
+             "rank"=>1, 
+             "value"=>0.0, 
+             "potential_event"=>[{"institutions"=>"AcmeU"}]
+           }
+         },
+         {"ranking"=> {"rules"=>
+             [
+              {"rule"=>"clipped"}
+             ], 
+             "rank"=>2, 
+             "value"=>0.0, 
+             "potential_event"=>[{"institutions"=>"BraUn"}]
+           }
          }
-       },
-       {"ranking"=> {"rules"=>
-           [
-            {"rule"=>"clipped"}
-           ], 
-           "rank"=>2, 
-           "value"=>0.0, 
-           "potential_event"=>[{"institutions"=>"BraUn"}]
-         }
-       }
-      ],
-      "decision_point"=>"LMP_Insti"
-    }
-
+        ],
+        "decision_point"=>"LMP_Insti"
+      }
+    }      
     @translation = Babelicious::Mapper.translate(@mapping_tag.to_sym, hash)
   end 
 end

@@ -23,11 +23,11 @@ module Babelicious
       hash = {}
       element = ""
       @path_translator.inject_with_index(hash) do |hsh, element, index|
-        return hsh[element.to_sym] if (index == @path_translator.last_index && index != 0)
+        return source_element(hsh, element) if (index == @path_translator.last_index && index != 0)
         if hsh.empty?
           source_element(source, element)
         else 
-          hsh[element.to_sym]
+          source_element(hsh, element)
         end
       end
 

@@ -1,7 +1,10 @@
 require 'xml/libxml'
 
 def new_node(name)
-  XML::Node.new(name)
+  node = XML::Node.new(name)
+
+  yield node if block_given?
+  node
 end 
 
 module BabeliciousNodeHacks
