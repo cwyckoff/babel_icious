@@ -42,11 +42,11 @@ module Babelicious
       end
 
       def mappings
-        @mapped_targets ||= {}
+        @definitions ||= {}
       end
       
       def reset
-        @mapped_targets, @direction = nil, {}
+        @definitions, @direction = nil, {}
       end
 
       def to(&block)
