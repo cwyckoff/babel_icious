@@ -8,7 +8,7 @@ module Babelicious
       attr_reader :direction, :current_map_definition_key
 
       def [](key)
-        mappings[key.to_sym]
+        definitions[key.to_sym]
       end 
       
       def config(key)
@@ -37,16 +37,16 @@ module Babelicious
       end
       
       def map(opts={})
-        current_map_definition.register_mapping(opts)
+        current_map_definition.register_rule(opts)
         self
       end
 
-      def mappings
-        @definitions ||= {}
+      def definitions
+        @map_definitions ||= {}
       end
       
       def reset
-        @definitions, @direction = nil, {}
+        @map_definitions, @direction = nil, {}
       end
 
       def to(&block)
@@ -55,9 +55,9 @@ module Babelicious
       end
       
       def translate(key=nil, source=nil)
-        raise MapperError, "No target mapper exists for key #{key}" unless mappings.has_key?(key)
+        raise MapperError, "No target mapper exists for key #{key}" unless definitions.has_key?(key)
         
-        mappings[key].translate(source)
+        definitions[key].translate(source)
       end
       
       def when(&block)
@@ -72,11 +72,11 @@ module Babelicious
       private
       
       def current_map_definition
-        mappings[@current_map_definition_key] ||= MapDefinition.new
+        definitions[@current_map_definition_key] ||= MapDefinition.new
       end
       
       def mapping_already_exists?(key)
-        mappings.keys.include?(key)
+        definitions.keys.include?(key)
       end
 
     end

@@ -3,10 +3,10 @@ class MapDefinitionError < Exception; end
 module Babelicious
 
   class MapDefinition
-    attr_reader :mappings, :direction
+    attr_reader :rules, :direction
     
     def initialize
-      @mappings = []
+      @rules = []
     end
 
     def direction=(dir)
@@ -18,7 +18,7 @@ module Babelicious
     
     def translate(source)
       target = nil
-      @mappings.each do |rule|
+      @rules.each do |rule|
         target = rule.initial_target if target.nil?
         filtered_source = rule.filtered_source(source) if filtered_source.nil?
         
@@ -29,32 +29,32 @@ module Babelicious
     end
     
     def register_condition(condition_key, condition=nil, &block)
-      @mappings.last.target.register_condition(condition_key, condition, &block)
+      @rules.last.target.register_condition(condition_key, condition, &block)
     end
     
     def register_customized(&block)
-      @mappings.last.target.register_customized(&block)
+      @rules.last.target.register_customized(&block)
     end
     
     def register_from(from_str)
       raise MapDefinitionError, "Please specify a source mapping" if from_str.nil?
       source = MapFactory.source(@direction, {:from => from_str})
 
-      @mappings << MapRule.new(source)
+      @rules << MapRule.new(source)
     end
 
     def register_to(&block)
-      raise MapDefinitionError, "You must call the .from method before customizing the .to method (e.g., m.from(\"foo\").to {|value| ...}" unless @mappings.last
+      raise MapDefinitionError, "You must call the .from method before customizing the .to method (e.g., m.from(\"foo\").to {|value| ...}" unless @rules.last
 
       target = MapFactory.target(@direction, {:to => '', :to_proc => block})
-      @mappings.last.target = target
+      @rules.last.target = target
     end
 
     def register_include(map_definition=nil, opts={})
       raise MapDefinitionError, "A mapping definition key is required (e.g., m.include(:another_map))" if map_definition.nil?
       raise MapDefinitionError, "Mapping definition for #{map_definition} does not exist" unless (other_mapper = Mapper[map_definition.to_sym])
 
-      other_mapper.mappings.each do |m|
+      other_mapper.rules.each do |m|
         source = m.source.dup
         target = m.target.dup
 
@@ -63,18 +63,18 @@ module Babelicious
           target.path_translator.unshift(opts[:inside_of])
         end 
         
-        @mappings << MapRule.new(source, target)
+        @rules << MapRule.new(source, target)
       end 
     end
 
-    def register_mapping(opts={})
+    def register_rule(opts={})
       raise MapDefinitionError, "Both :from and :to keys must be set (e.g., {:from => \"foo/bar\", :to => \"bar/foo\")" unless (opts[:from] && opts[:to])
       
-      @mappings << MapRule.new(MapFactory.source(@direction, opts), MapFactory.target(@direction, opts))
+      @rules << MapRule.new(MapFactory.source(@direction, opts), MapFactory.target(@direction, opts))
     end
     
     def reset
-      @mappings, @direction = [], nil
+      @rules, @direction = [], nil
     end
   end
 end

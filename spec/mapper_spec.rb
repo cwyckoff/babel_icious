@@ -5,7 +5,7 @@ module Babelicious
   describe "Mapper" do
 
     before(:each) do 
-      MapDefinition.stub!(:new).and_return(@map_definition = mock("MapDefinition", :register_mapping => nil, :direction= => nil))
+      MapDefinition.stub!(:new).and_return(@map_definition = mock("MapDefinition", :register_rule => nil, :direction= => nil))
     end
     
     describe ".config" do
@@ -111,7 +111,7 @@ module Babelicious
       
       it "should register mappings" do 
         # expect
-        @map_definition.should_receive(:register_mapping).with(@opts)
+        @map_definition.should_receive(:register_rule).with(@opts)
 
         # given
         Mapper.map @opts
@@ -134,7 +134,7 @@ module Babelicious
         Mapper.reset
         
         # expect
-        Mapper.mappings.should == {}
+        Mapper.definitions.should == {}
       end
     end
 

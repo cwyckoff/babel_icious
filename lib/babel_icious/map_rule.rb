@@ -15,6 +15,14 @@ module Babelicious
       @target.class.initial_target
     end 
 
+    def source_path
+      @source.path_translator.full_path
+    end 
+
+    def target_path
+      @target.path_translator.full_path
+    end 
+
     def translate(target_data, source_value)
       if(@target.opts[:to_proc])
         @target.path_translator.set_path(@target.opts[:to_proc].call(source_value))

@@ -93,27 +93,52 @@ module Babelicious
 
     context "#initial_target" do
 
-      it "should delegate to target strategy" do
+      before(:each) do
         # given
         source = mock("XmlMap")
         target = mock("HashMap", :class => HashMap)
-        map_rule = MapRule.new(source, target)
+        @map_rule = MapRule.new(source, target)
+      end
 
+      it "should delegate to target strategy" do
         # expect
         HashMap.should_receive(:initial_target)
         
         # when
-        map_rule.initial_target
+        @map_rule.initial_target
       end
 
       it "should return initial target data structure for target strategy" do
-        # given
-        source = mock("XmlMap")
-        target = mock("HashMap", :class => HashMap)
-        map_rule = MapRule.new(source, target)
+        @map_rule.initial_target.should == {}
+      end
 
-        # expect
-        map_rule.initial_target.should == {}
+    end
+
+    context "source and target path shortcuts" do
+      
+      before(:each) do
+        # given
+        @source_path_translator = mock("PathTranslator", :full_path => "foo/bar")
+        @target_path_translator = mock("PathTranslator", :full_path => "bar/foo")
+        @source = mock("XmlMap", :path_translator => @source_path_translator)
+        @target = mock("HashMap", :class => HashMap, :path_translator => @target_path_translator)
+        @map_rule = MapRule.new(@source, @target)
+      end
+
+      context "#source_path" do
+
+        it "should return full path for mapping" do
+          @map_rule.source_path.should == @source_path_translator.full_path
+        end
+
+      end
+
+      context "#target_path" do
+
+        it "should return full path for mapping" do
+          @map_rule.target_path.should == @target_path_translator.full_path
+        end
+
       end
 
     end
