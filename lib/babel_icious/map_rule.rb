@@ -19,6 +19,14 @@ module Babelicious
       @source.path_translator.full_path
     end 
 
+    def source_value(src)
+      if map_condition?
+        @source.value_from(src) if map_condition.is_satisfied_by(source_value)
+      else 
+        @source.value_from(src)
+      end 
+    end 
+
     def target_path
       @target.path_translator.full_path
     end 
@@ -32,6 +40,16 @@ module Babelicious
       end 
     end 
 
+    private
+
+    def map_condition
+      @map_condition ||= MapCondition.new
+    end
+
+    def map_condition?
+      @map_condition
+    end
+    
   end 
 
 end 

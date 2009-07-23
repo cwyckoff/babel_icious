@@ -31,8 +31,8 @@ module Babelicious
         end
       end
 
-      rescue
-        raise "There was a problem extracting the value from your hash.  It seems to be missing element '#{element}'"
+      rescue Exception => e
+        raise "There was a problem extracting the value from your hash at map definition source path '#{@path_translator.full_path}'."
     end
 
     protected
@@ -52,7 +52,7 @@ module Babelicious
     private
     
     def source_element(source, element)
-      source[element.to_sym] || source[element.to_s]
+      source[element.to_sym] || source[element.to_s] || ''
     end
     
     def map_source_value(source_value)

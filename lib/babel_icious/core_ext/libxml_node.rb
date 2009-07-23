@@ -1,9 +1,14 @@
 require 'xml/libxml'
 
-def new_node(name)
+def new_node(name, val=nil)
   node = XML::Node.new(name)
+  
+  if(val)
+    node << val
+  else 
+    yield node if block_given?
+  end 
 
-  yield node if block_given?
   node
 end 
 

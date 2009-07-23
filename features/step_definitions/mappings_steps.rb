@@ -92,13 +92,8 @@ Given /^a customized mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |s
           val.each do |rnk|
             rankings << new_node("ranking") do |ranking|
 
-              ranking << new_node("rank") do |rank|
-                rank << rnk["ranking"]["rank"]
-              end 
-
-              ranking << new_node("value") do |value|
-                value << rnk["ranking"]["value"]
-              end 
+              ranking << new_node("rank", rnk["ranking"]["rank"])
+              ranking << new_node("value", rnk["ranking"]["value"])
 
               ranking << new_node("rules") do |rules|
                 rnk["ranking"]["rules"].each do |rl| 
