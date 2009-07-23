@@ -20,11 +20,7 @@ module Babelicious
     end 
 
     def source_value(src)
-      if map_condition?
-        @source.value_from(src) if map_condition.is_satisfied_by(source_value)
-      else 
-        @source.value_from(src)
-      end 
+      @source.value_from(src)
     end 
 
     def target_path
@@ -40,16 +36,6 @@ module Babelicious
       end 
     end 
 
-    private
-
-    def map_condition
-      @map_condition ||= MapCondition.new
-    end
-
-    def map_condition?
-      @map_condition
-    end
-    
   end 
 
 end 

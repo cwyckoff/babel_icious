@@ -26,7 +26,7 @@ module Babelicious
     def register_customized(&block)
       @customized_map = block
     end
-    
+
     protected
 
     def map_condition
