@@ -22,6 +22,7 @@ module Babelicious
     def value_from(source)
       hash = {}
       element = ""
+      return source if (@path_translator.full_path == "" || @path_translator.full_path == "/")
       @path_translator.inject_with_index(hash) do |hsh, element, index|
         return source_element(hsh, element) if (index == @path_translator.last_index && index != 0)
         if hsh.empty?

@@ -23,7 +23,6 @@ module Babelicious
         filtered_source = rule.filtered_source(source) if filtered_source.nil?
         
         source_value = rule.source_value(filtered_source)
-#        source_value = rule.source.value_from(filtered_source)
         rule.translate(target, source_value)
       end
       target
