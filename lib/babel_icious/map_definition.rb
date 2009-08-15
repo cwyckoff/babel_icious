@@ -62,7 +62,7 @@ module Babelicious
           source.path_translator.unshift(opts[:inside_of])
           target.path_translator.unshift(opts[:inside_of])
         end 
-        
+
         @rules << MapRule.new(source, target)
       end 
     end

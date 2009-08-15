@@ -29,7 +29,7 @@ module Babelicious
       if(@condition == :nil)
         !source_value.nil?
       else 
-        eval "!source_value.nil? && !source_value.#{@condition.to_s}?"
+        eval "!source_value.nil? && !source_value.to_s.#{@condition.to_s}?"
       end
     end
     
