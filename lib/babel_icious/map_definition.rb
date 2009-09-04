@@ -16,18 +16,6 @@ module Babelicious
       @direction = dir
     end
     
-    def translate(source)
-      target = nil
-      @rules.each do |rule|
-        target = rule.initial_target if target.nil?
-        filtered_source = rule.filtered_source(source) if filtered_source.nil?
-        
-        source_value = rule.source_value(filtered_source)
-        rule.translate(target, source_value)
-      end
-      target
-    end
-    
     def register_condition(condition_key, condition=nil, &block)
       @rules.last.target.register_condition(condition_key, condition, &block)
     end
@@ -41,13 +29,6 @@ module Babelicious
       source = MapFactory.source(@direction, {:from => from_str})
 
       @rules << MapRule.new(source)
-    end
-
-    def register_to(&block)
-      raise MapDefinitionError, "You must call the .from method before customizing the .to method (e.g., m.from(\"foo\").to {|value| ...}" unless @rules.last
-
-      target = MapFactory.target(@direction, {:to => '', :to_proc => block})
-      @rules.last.target = target
     end
 
     def register_include(map_definition=nil, opts={})
@@ -76,6 +57,33 @@ module Babelicious
     def reset
       @rules, @direction = [], nil
     end
+
+    def register_prepopulate(target_data)
+      source_proxy = SourceProxy.new
+      @rules << MapRule.new(source_proxy, MapFactory.target(@direction, {:to => target_data}))
+      source_proxy
+    end
+
+    def register_to(&block)
+      raise MapDefinitionError, "You must call the .from method before customizing the .to method (e.g., m.from(\"foo\").to {|value| ...}" unless @rules.last
+
+      target = MapFactory.target(@direction, {:to => '', :to_proc => block})
+      @rules.last.target = target
+    end
+    
+    def translate(source)
+      target = nil
+      @rules.each do |rule|
+        target = rule.initial_target if target.nil?
+        filtered_source = rule.filtered_source(source) if filtered_source.nil?
+        
+        source_value = rule.source_value(filtered_source)
+        rule.translate(target, source_value)
+      end
+      target
+    end
+
   end
+
 end
 

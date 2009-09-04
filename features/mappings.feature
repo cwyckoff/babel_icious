@@ -41,6 +41,11 @@ Scenario: Mapping with .from and .to methods
   When the mapping with custom .to method is translated
   Then the target should be correctly processed for custom .to conditions
 
+Scenario: Mapping with .prepopulate
+  Given a mapping exists with prepopulate method
+  When the mapping with prepopulate method is translated
+  Then the target should be correctly processed prepopulate conditions
+
 Scenario: Including mappings from another map definition
   Given a mapping exists with include
   When the mapping with include is translated

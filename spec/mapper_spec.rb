@@ -138,6 +138,19 @@ module Babelicious
       end
     end
 
+    describe ".prepopulate" do 
+
+      it "should delegate prepopulate data to target mapper" do 
+        # expect
+        @map_definition.should_receive(:register_prepopulate).with("event/api_version")
+
+        # given
+        Mapper.reset
+        Mapper.prepopulate("event/api_version")
+      end 
+
+    end 
+
     describe ".to" do 
 
       it "should delegate target block to target mapper" do 

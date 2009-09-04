@@ -22,6 +22,10 @@ module Babelicious
         current_map_definition.register_customized(&block)
       end
 
+      def definitions
+        @map_definitions ||= {}
+      end
+      
       def direction(dir={})
         current_map_definition.direction = @direction = dir
       end
@@ -41,10 +45,10 @@ module Babelicious
         self
       end
 
-      def definitions
-        @map_definitions ||= {}
+      def prepopulate(data)
+        current_map_definition.register_prepopulate(data)
       end
-      
+
       def reset
         @map_definitions, @direction = nil, {}
       end
@@ -60,15 +64,15 @@ module Babelicious
         definitions[key].translate(source)
       end
       
-      def when(&block)
-        current_map_definition.register_condition(:when, nil, &block)
-      end
-
       def unless(condition=nil, &block)
         current_map_definition.register_condition(:unless, condition, &block)
         self
       end
       
+      def when(&block)
+        current_map_definition.register_condition(:when, nil, &block)
+      end
+
       private
       
       def current_map_definition

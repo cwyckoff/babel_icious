@@ -180,6 +180,15 @@ Given /^a contact mapping exists with nested include$/ do
   end
 end
 
+Given /^a mapping exists with prepopulate method$/ do
+  Babelicious::Mapper.config(:api) do |m|
+    m.direction :from => :hash, :to => :xml
+
+    m.prepopulate("event/api_version").with("2.0.1")
+    m.map :from => "name/first", :to => "event/first_name"
+    m.map :from => "name/last", :to => "event/last_name"
+  end
+end
 
 
 #
@@ -305,6 +314,12 @@ When /^the mapping with nested include is translated$/ do
   @translation = Babelicious::Mapper.translate(:a_sample_contact, hash)
 end
 
+When /^the mapping with prepopulate method is translated$/ do
+  hash = {:name => {:first => "Dave", :last => "Brady"}}
+  @translation = Babelicious::Mapper.translate(:api, hash)
+end
+
+
 
 #
 ##
@@ -389,3 +404,15 @@ Then /^the target should have nested mappings included from different map$/ do
   @translation.should == {"contact" => { "first_name" => "Dave", "last_name" => "Brady", "home_phone" => "1231231234"}}
 end
 
+Then /^the target should be correctly processed prepopulate conditions$/ do
+  xml = <<-EOT
+<?xml version="1.0" encoding="UTF-8"?>
+<event>
+  <api_version>2.0.1</api_version>
+  <first_name>Dave</first_name>
+  <last_name>Brady</last_name>
+</event>
+EOT
+
+  @translation.to_s.should == xml
+end

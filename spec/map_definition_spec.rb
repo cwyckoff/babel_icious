@@ -199,9 +199,38 @@ module Babelicious
       end
     end
 
+    describe "#register_prepopulate" do 
+
+      before(:each) do
+        @target_data = 'event/api_version'
+      end
+      
+      it "should create new target object" do 
+        # expect
+        MapFactory.should_receive(:target).with({:from => :xml, :to => :hash}, {:to => @target_data})
+        
+        # when
+        @map_definition.register_prepopulate(@target_data)
+      end
+
+      it "should add source_proxy to rules array" do
+        # when
+        @map_definition.register_prepopulate(@target_data)
+
+        # expect
+        @map_definition.rules.last.source.should be_a_kind_of(SourceProxy)
+      end
+
+      it "should return a source proxy object" do
+        source = @map_definition.register_prepopulate(@target_data)
+        source.should be_a_kind_of(SourceProxy)
+      end
+
+    end
+
     describe "#register_to" do 
       
-      it "should create new source object" do 
+      it "should create new target object" do 
         # expect
         MapFactory.should_receive(:target).with({:from => :xml, :to => :hash}, {:to => '', :to_proc => nil})
         
@@ -209,7 +238,7 @@ module Babelicious
         @map_definition.register_to
       end
 
-      it "should add source to rules array" do 
+      it "should add target to rules array" do 
         # given
         map_rule = MapRule.new(@source_element)
         @map_definition.reset

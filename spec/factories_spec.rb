@@ -76,4 +76,44 @@ module Babelicious
     end
   end 
 
+  
+  describe SourceProxy do
+
+    before(:each) do
+      @source_proxy = SourceProxy.new
+    end
+
+    describe ".filter_source" do
+
+      it "should return source argument" do
+        SourceProxy.filter_source("foo").should == "foo"
+      end
+      
+    end
+
+    describe "#value_from" do
+
+      it "should return source_value" do
+        # when
+        @source_proxy.with("foo")
+
+        # expect
+        @source_proxy.value_from.should == "foo"
+      end
+
+    end 
+
+    describe "#with" do
+      
+      it "should set argument as source variable" do
+        # when
+        @source_proxy.with("foo")
+
+        # expect
+        @source_proxy.value_from.should == "foo"
+      end
+      
+    end
+    
+  end
 end
