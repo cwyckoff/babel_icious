@@ -91,6 +91,14 @@ module Babelicious
       
     end
 
+    describe "#path_translator" do
+
+      it "should return path_translator object" do
+        @source_proxy.path_translator.should be_an_instance_of(PathTranslator)
+      end
+      
+    end
+
     describe "#value_from" do
 
       it "should return source_value" do
