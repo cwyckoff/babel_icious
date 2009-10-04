@@ -27,6 +27,15 @@ module Babelicious
       @target.path_translator.full_path
     end 
 
+    def reverse(target_data, source_value)
+      if(@source.opts[:to_proc])
+        @source.path_translator.set_path(@source.opts[:to_proc].call(source_value))
+        @source.map_from(target_data, source_value)
+      else 
+        @source.map_from(target_data, source_value)
+      end 
+    end 
+    
     def translate(target_data, source_value)
       if(@target.opts[:to_proc])
         @target.path_translator.set_path(@target.opts[:to_proc].call(source_value))

@@ -55,3 +55,8 @@ Scenario: Including mappings from another map definition with nesting
   Given a contact mapping exists with nested include
   When the mapping with nested include is translated
   Then the target should have nested mappings included from different map 
+
+Scenario: Reverse existing mapping
+  Given a mapping exists for 'hash' to 'xml' with tag 'reverse_contact'
+  When the mapping is reversed
+  Then the target should be correctly reversed

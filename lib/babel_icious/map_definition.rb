@@ -70,6 +70,18 @@ module Babelicious
       target = MapFactory.target(@direction, {:to => '', :to_proc => block})
       @rules.last.target = target
     end
+
+    def reverse(source)
+      target = nil
+      @rules.each do |rule|
+        target = rule.source.class.initial_target if target.nil?
+        filtered_source = rule.target.class.filter_source(source) if filtered_source.nil?
+        
+        source_value = rule.target.value_from(filtered_source)
+        rule.reverse(target, source_value)
+      end
+      target
+    end
     
     def translate(source)
       target = nil

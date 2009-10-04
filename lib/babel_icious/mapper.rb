@@ -53,6 +53,12 @@ module Babelicious
         @map_definitions, @direction = nil, {}
       end
 
+      def reverse(key, source)
+        raise MapperError, "No target mapper exists for key #{key}" unless definitions.has_key?(key)
+        
+        definitions[key].reverse(source)
+      end 
+
       def to(&block)
         current_map_definition.register_to(&block)
         self

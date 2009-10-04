@@ -319,6 +319,19 @@ When /^the mapping with prepopulate method is translated$/ do
   @translation = Babelicious::Mapper.translate(:api, hash)
 end
 
+When /^the mapping is reversed$/ do
+  xml = <<-EOL
+<bar>
+ <foo>a</foo>
+ <boo>b</boo>
+ <cuk>
+  <coo>c</coo>
+  <doo>d</doo>
+ </cuk>
+</bar>
+EOL
+  @translation = Babelicious::Mapper.reverse(@tag.to_sym, xml)
+end
 
 
 #
@@ -415,4 +428,9 @@ Then /^the target should be correctly processed prepopulate conditions$/ do
 EOT
 
   @translation.to_s.should == xml
+end
+
+Then /^the target should be correctly reversed$/ do
+  hash = {"foo" => {"bar" => "a", "baz" => "b", "cuk" => {"coo" => "c", "doo" => "d"}}}
+  @translation.should == hash
 end
