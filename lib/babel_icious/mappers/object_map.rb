@@ -20,8 +20,11 @@ module Babelicious
     end
     
     def value_from(source)
-      method = @path_translator.full_path.gsub("/", ".")
-      return source.send(method.to_sym)
+      value = source
+      @path_translator.full_path.split("/").each do |method|
+        value = value.send(method.to_sym)
+      end
+      value
     end
 
   end

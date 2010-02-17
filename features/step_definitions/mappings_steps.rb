@@ -36,7 +36,7 @@ Given /^a mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |source, targ
 
       m.map :from => "foo", :to => "foo/zoo"
       m.map :from => "bar", :to => "foo/yoo"
-      m.map :from => "boo", :to => "foo/soo/roo"
+      m.map :from => "boo/coo", :to => "foo/soo/roo"
     end
   end
 end
@@ -224,10 +224,14 @@ EOL
     @translation = Babelicious::Mapper.translate(@tag.to_sym, source)
   when {:from => :object, :to => :xml}
     source = {:foo => "a", :bar => "b", :baz => "c", :boo => "d"}
+    class CooBar
+      def coo;"c"; end
+    end
+
     class FooBar
       def foo; "a"; end
       def bar; "b"; end
-      def boo; "c"; end
+      def boo; CooBar.new; end
     end
     @translation = Babelicious::Mapper.translate(@tag.to_sym, FooBar.new)
   end
