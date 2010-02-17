@@ -12,6 +12,7 @@ require "babel_icious/path_translator"
 require "babel_icious/mappers/base_map"
 require "babel_icious/mappers/xml_map"
 require "babel_icious/mappers/hash_map"
+require "babel_icious/mappers/object_map"
 require "babel_icious/mapper"
 require "babel_icious/map_condition"
 

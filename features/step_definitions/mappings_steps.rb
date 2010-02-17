@@ -30,6 +30,14 @@ Given /^a mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |source, targ
       m.map :from => "baz", :to => "too"
       m.map :from => "boo", :to => "soo/roo"
     end
+  when {:from => :object, :to => :xml}
+    Babelicious::Mapper.config(@tag.to_sym) do |m|
+      m.direction :from => :object, :to => :xml
+
+      m.map :from => "foo", :to => "foo/zoo"
+      m.map :from => "bar", :to => "foo/yoo"
+      m.map :from => "boo", :to => "foo/soo/roo"
+    end
   end
 end
 
@@ -214,6 +222,14 @@ EOL
   when {:from => :hash, :to => :hash}
     source = {:foo => "a", :bar => "b", :baz => "c", :boo => "d"}
     @translation = Babelicious::Mapper.translate(@tag.to_sym, source)
+  when {:from => :object, :to => :xml}
+    source = {:foo => "a", :bar => "b", :baz => "c", :boo => "d"}
+    class FooBar
+      def foo; "a"; end
+      def bar; "b"; end
+      def boo; "c"; end
+    end
+    @translation = Babelicious::Mapper.translate(@tag.to_sym, FooBar.new)
   end
 end
 
@@ -345,6 +361,8 @@ Then /^the xml should be correctly mapped$/ do
     @translation.to_s.gsub(/\s/, '').should == '<?xmlversion="1.0"encoding="UTF-8"?><bar><foo>a</foo><boo>b</boo><cuk><coo>c</coo><doo>d</doo></cuk></bar>'    
   when {:from => :hash, :to => :hash}
     @translation.should == {"zoo" => "a", "yoo" => "b", "too" => "c", "soo" => {"roo" => "d"}}
+  when {:from => :object, :to => :xml}
+    @translation.to_s.gsub(/\s/, '').should == '<?xmlversion="1.0"encoding="UTF-8"?><foo><zoo>a</zoo><yoo>b</yoo><soo><roo>c</roo></soo></foo>'
   end
 end
 

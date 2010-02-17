@@ -31,9 +31,6 @@ module Babelicious
           source_element(hsh, element)
         end
       end
-
-      rescue Exception => e
-        raise "There was a problem extracting the value from your hash at map definition source path '#{@path_translator.full_path}'."
     end
 
     protected

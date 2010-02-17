@@ -29,9 +29,6 @@ module Babelicious
           return node.content
         end
       end
-
-      rescue
-        raise "There was a problem extracting the value from your xml at mapping '#{@path_translator.full_path}'"
     end
 
     protected
@@ -44,9 +41,6 @@ module Babelicious
         populate_nodes(xml_output)
         map_from(xml_output, source_value)
       end 
-
-      rescue Exception => e
-        raise "There was a problem mapping the xml output for mapping '#{@path_translator.full_path}' with source value #{source_value}"
     end
     
     private

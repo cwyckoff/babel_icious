@@ -1,15 +1,16 @@
 Feature: Babel-icious mapping
 
-Scenario Outline: Mapping from xml to a hash
+Scenario Outline: Mapping xml, hash, and object
   Given a mapping exists for '<Source>' to '<Target>' with tag '<MappingTag>'
   When the mapping is translated
   Then the xml should be correctly mapped
 
   Examples:
   | Source | Target | MappingTag |
-  | xml    | hash   | foo 	 |
-  | hash   | xml    | bar 	 |
-  | hash   | hash   | baz 	 |
+  | xml    | hash   | foo        |
+  | hash   | xml    | bar        |
+  | hash   | hash   | baz        |
+  | object | xml    | boo        |
 
 Scenario Outline: Mapping with conditions
   Given a mapping exists with '<Condition>' condition
