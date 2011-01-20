@@ -7,8 +7,8 @@ module Babelicious
     before(:each) do
       xml = '<foo>bar</foo>'
       @hash_map_klass = mock("HashMapKlass", :initial_target => {})
-      MapFactory.stub!(:source).and_return(@source_element = mock("XmlMap", :value_from => "bar"))
-      MapFactory.stub!(:target).and_return(@target_element = mock("HashMap", :map_from => {}, :class => @hash_map_klass))
+      MapFactory.stub!(:source).and_return(@source_element = mock("XmlMap", :value_from => "bar", :gc_context => nil))
+      MapFactory.stub!(:target).and_return(@target_element = mock("HashMap", :map_from => {}, :class => @hash_map_klass, :gc_context => nil))
       @map_definition = MapDefinition.new
       @map_definition.direction = {:from => :xml, :to => :hash}
       @opts = {:to => "bar/foo", :from => "foo/bar"}

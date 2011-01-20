@@ -1,9 +1,15 @@
-require 'xml/libxml'
+require 'nokogiri'
 
-def new_node(name, val=nil)
-  node = XML::Node.new(name)
-  
+def new_node(name, val=nil, fakecontext=false)
+  context = Babelicious::Mapper.gc_context
+
+  # gc context can be faked during testing
+  context ||= Nokogiri::XML::Document.new if fakecontext
+
+  node = Nokogiri::XML::Node.new(name, context)
+
   if(val)
+    val = val.to_s if val.is_a? Numeric
     node << val
   else 
     yield node if block_given?
@@ -13,7 +19,7 @@ def new_node(name, val=nil)
 end 
 
 module BabeliciousNodeHacks
-
+    
   def add(*nodes)
     nodes.each { |n| self << n }
     self
@@ -47,6 +53,10 @@ module BabeliciousNodeHacks
       end 
     end 
   end
+
+  def find(*args)
+    xpath(*args)
+  end
   
   private
   
@@ -58,4 +68,13 @@ module BabeliciousNodeHacks
 
 end
 
-class XML::Node; include BabeliciousNodeHacks; end
+class Nokogiri::XML::Node
+  include BabeliciousNodeHacks
+  
+  alias_method :orig_append, :<<
+
+  def << string
+    orig_append(string)
+    self
+  end
+end

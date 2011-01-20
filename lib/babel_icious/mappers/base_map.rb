@@ -1,7 +1,7 @@
 module Babelicious
   
   class BaseMap
-    attr_reader :opts, :path_translator
+    attr_reader :opts, :path_translator, :gc_context
     
     def initialize_copy(other)
       @opts = {}

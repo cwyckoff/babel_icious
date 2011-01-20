@@ -1,4 +1,4 @@
-require 'xml'
+require 'nokogiri'
 
 module Babelicious
   
@@ -8,17 +8,19 @@ module Babelicious
     class << self
       
       def initial_target
-        XML::Document.new
+        d = Nokogiri::XML::Document.new
+        d.encoding = 'UTF-8'
+        d
       end
       
       def filter_source(source)
-        XML::Document.string(source)
+        Nokogiri::XML::Document.parse(source)
       end
       
     end
     
     def initialize(path_translator, opts={})
-      @path_translator, @opts = path_translator, opts
+      @path_translator, @opts, @gc_context = path_translator, opts, Nokogiri::XML::Document.new
     end
     
     def value_from(source)
@@ -67,7 +69,7 @@ module Babelicious
       return if @index == 0
 
       if(node = previous_node(xml_output))
-        new_node = XML::Node.new(@path_translator[@index+1])
+        new_node = Nokogiri::XML::Node.new(@path_translator[@index+1], xml_output)
         node << new_node
       else 
         populate_nodes(xml_output)
@@ -82,7 +84,7 @@ module Babelicious
     
     def set_root(xml_output)
       if xml_output.root.nil?
-        xml_output.root = XML::Node.new(@path_translator[0])
+        xml_output.root = Nokogiri::XML::Node.new(@path_translator[0], xml_output)
       end 
     end
     

@@ -1,6 +1,6 @@
 spec = Gem::Specification.new do |s|
   s.name = 'babel_icious'
-  s.version = '0.0.7'
+  s.version = '0.0.8'
   s.date = '2009-09-04'
   s.summary = 'Babel_icious dynamic and scalable mapping tool'
   s.email = "github@cwyckoff.com"
@@ -10,7 +10,7 @@ spec = Gem::Specification.new do |s|
   s.rdoc_options = ["--line-numbers", "--inline-source", "--main", "README.rdoc", "--title", "Babel_icious - A Mapping Tool for the Ages"]
   s.extra_rdoc_files = ["README.rdoc", "MIT-LICENSE"]
   s.authors = ["Chris Wyckoff"]
-  s.add_dependency('libxml-ruby')
+  s.add_dependency('nokogiri')
   
   s.files = ["init.rb",
 	     "lib/babel_icious.rb",

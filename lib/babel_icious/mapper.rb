@@ -73,6 +73,10 @@ module Babelicious
         current_map_definition.register_condition(:when, nil, &block)
       end
 
+      def gc_context
+        current_map_definition.gc_context
+      end
+      
       private
       
       def current_map_definition

@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'ruby-debug'
 require 'babel_icious'
-require File.expand_path(File.dirname(__FILE__) + "/../market/lib/event_api/mappings/events.rb")
+#require File.expand_path(File.dirname(__FILE__) + "/../market/lib/event_api/mappings/events.rb")
  
 # task :default => [:]
 
