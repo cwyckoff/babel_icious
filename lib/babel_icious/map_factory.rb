@@ -15,6 +15,12 @@ module Babelicious
 
   class SourceProxy
 
+    attr_reader :path_translator
+
+    def initialize
+      @path_translator = PathTranslator.new("/")
+    end
+
     def self.filter_source(source)
       source
     end

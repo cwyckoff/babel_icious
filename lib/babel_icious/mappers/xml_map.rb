@@ -24,7 +24,7 @@ module Babelicious
     end
     
     def value_from(source)
-      source.find("/#{@path_translator.full_path}").each do |node|
+      source.xpath("/#{@path_translator.full_path}").each do |node|
         if(node.children.size > 1)
           return node
         else
@@ -59,6 +59,10 @@ module Babelicious
       else 
         if(source_value.is_a?(String))
           source_value.strip
+        elsif(source_value.is_a?(TrueClass))
+          "true"
+        elsif(source_value.is_a?(FalseClass))
+          "false"
         else
           source_value
         end 
@@ -78,7 +82,7 @@ module Babelicious
 
     def previous_node(xml_output)
       @index -= 1
-      node = xml_output.find("//#{@path_translator[0..@index].join("/")}")
+      node = xml_output.xpath("//#{@path_translator[0..@index].join("/")}")
       node[0]
     end
     
@@ -89,7 +93,7 @@ module Babelicious
     end
     
     def update_node?(xml_output, source_value)
-      node = xml_output.find("/#{@path_translator.full_path}")
+      node = xml_output.xpath("/#{@path_translator.full_path}")
       unless(node.empty?)
         node[0] << map_source_value(source_value) # source_value.strip unless source_value.nil?
         return true
