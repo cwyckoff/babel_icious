@@ -4,6 +4,10 @@ module Babelicious
 
   describe Object do
 
+    before do
+      @doc = Nokogiri::XML::Document.new
+    end
+
     describe "#new_node" do
 
       it "should create a new Nokogiri::XML::Node instance" do
@@ -13,7 +17,7 @@ module Babelicious
         end
         
         # when
-        new_node("foo")
+        new_node("foo", @doc)
       end
 
       context "if block is passed" do
@@ -23,7 +27,7 @@ module Babelicious
           Nokogiri::XML::Node.stub!(:new).and_return(node = mock("Nokogiri::XML::Node"))
 
           # expect
-          new_node("foo") do |nd|
+          new_node("foo", @doc) do |nd|
             nd.should == node
           end 
         end
@@ -37,8 +41,8 @@ module Babelicious
 </foo>
 EOL
 
-        foo_node = new_node("foo", nil, true) do |foo_node|
-          foo_node << new_node("bar", nil, true) do |bar_node|
+        foo_node = new_node("foo", @doc) do |foo_node|
+          foo_node << new_node("bar", @doc) do |bar_node|
             bar_node << "baz"
           end 
         end
