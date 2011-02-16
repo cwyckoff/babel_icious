@@ -1,0 +1,6 @@
+*.gem
+*~
+.bundle
+.rspec
+.rvmrc
+TAGS
