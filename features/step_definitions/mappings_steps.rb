@@ -86,25 +86,25 @@ Given /^a customized mapping exists for '(.*)' to '(.*)' with tag '(.*)'$/ do |s
     Babelicious::Mapper.config(@mapping_tag.to_sym) do |m|
       m.direction @direction
       
-      m.map(:from => "event/rankings", :to => "event/response").customize do |val, target|
-        node = new_node("rankings", target) do |rankings|
+      m.map(:from => "event/rankings", :to => "event/response").customize do |val|
+        node = new_node("rankings") do |rankings|
 
           val.each do |rnk|
-            rankings << new_node("ranking", target) do |ranking|
+            rankings << new_node("ranking") do |ranking|
 
-              ranking << new_node("rank", target, rnk["ranking"]["rank"])
-              ranking << new_node("value", target, rnk["ranking"]["value"])
+              ranking << new_node("rank", rnk["ranking"]["rank"])
+              ranking << new_node("value", rnk["ranking"]["value"])
 
-              ranking << new_node("rules", target) do |rules|
+              ranking << new_node("rules") do |rules|
                 rnk["ranking"]["rules"].each do |rl| 
-                  rule = new_node("rule", target) << rl["rule"]
+                  rule = new_node("rule") << rl["rule"]
                   rules << rule
                 end 
               end 
 
-              ranking << new_node("potential_event", target) do |potential_event|
+              ranking << new_node("potential_event") do |potential_event|
                 rnk["ranking"]["potential_event"].each do |e| 
-                  institution = new_node("institutions", target) << e["institutions"]
+                  institution = new_node("institutions") << e["institutions"]
                   potential_event << institution
                 end 
               end 

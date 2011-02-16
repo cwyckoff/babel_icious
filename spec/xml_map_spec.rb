@@ -7,7 +7,7 @@ module Babelicious
 
     before(:each) do 
       @node = mock("Nokogiri::XML::Document::Node", :content => "baz", :children => mock("Nokogiri::XML::Node", :size => 1))
-      @source = mock("Nokogiri::XML::Document", :xpath => [@node])
+      @source = mock("Nokogiri::XML::Document", :find => [@node])
       @path_translator = PathTranslator.new("foo/bar")
       @xml_map = @strategy = XmlMap.new(@path_translator)
     end
@@ -48,7 +48,7 @@ module Babelicious
       
       before(:each) do
         Nokogiri::XML::Node.stub!(:new).and_return(@xml_node = mock("Nokogiri::XML::Node", :empty? => false, :<< => nil))
-        @target_xml = mock("Nokogiri::XML::Document", :root => nil, :xpath => [@xml_node], :root= => nil)
+        @target_xml = mock("Nokogiri::XML::Document", :root => nil, :find => [@xml_node], :root= => nil)
       end
       
       def do_process 
@@ -77,7 +77,7 @@ module Babelicious
       before(:each) do 
         @child_node = mock("Nokogiri::XML::Node")
         @node = mock("Nokogiri::XML::Node", :children => [@child_node], :content => "foo")
-        @source = mock("Nokogiri::XML::Document", :xpath => [@node])
+        @source = mock("Nokogiri::XML::Document", :find => [@node])
       end
       
       describe "when node has only one child" do 
@@ -105,7 +105,7 @@ module Babelicious
         
         before(:each) do 
           @xml_target = Nokogiri::XML::Document.new
-          @target_xml.stub!(:xpath).and_return([])
+          @target_xml.stub!(:find).and_return([])
           @new_node = mock(@xml_node = mock("Nokogiri::XML::Node", :empty? => false, :<< => nil))
         end
 

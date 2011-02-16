@@ -32,8 +32,8 @@ module Babelicious
         end
       end
 
-      # rescue
-      #   raise "There was a problem extracting the value from your xml at mapping '#{@path_translator.full_path}'"
+      rescue
+        raise "There was a problem extracting the value from your xml at mapping '#{@path_translator.full_path}'"
     end
 
     protected
@@ -47,15 +47,15 @@ module Babelicious
         map_from(xml_output, source_value)
       end 
 
-      # rescue Exception => e
-      #   raise "There was a problem mapping the xml output for mapping '#{@path_translator.full_path}' with source value #{source_value}"
+      rescue Exception => e
+        raise "There was a problem mapping the xml output for mapping '#{@path_translator.full_path}' with source value #{source_value}"
     end
     
     private
 
     def map_source_value(source_value)
       if(@customized_map)
-        @customized_map.call(source_value, @gc_context)
+        @customized_map.call(source_value)
       else 
         if(source_value.is_a?(String))
           source_value.strip

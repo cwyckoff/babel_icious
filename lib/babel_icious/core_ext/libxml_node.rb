@@ -1,9 +1,10 @@
 require 'nokogiri'
 
-def new_node(name, context, val=nil)
-  
+def new_node(name, val=nil, fakecontext=false)
+  context = Babelicious::Mapper.gc_context
+
   # gc context can be faked during testing
-  #context ||= Nokogiri::XML::Document.new
+  context ||= Nokogiri::XML::Document.new if fakecontext
 
   node = Nokogiri::XML::Node.new(name, context)
 
@@ -72,9 +73,8 @@ class Nokogiri::XML::Node
   
   alias_method :orig_append, :<<
 
-  def << value
-    # todo   value = value.to_s if value.class == Numeric
-    orig_append(value)
+  def << string
+    orig_append(string)
     self
   end
 end
