@@ -60,7 +60,6 @@ module Babelicious
       
       def translate(key=nil, source=nil)
         raise MapperError, "No target mapper exists for key #{key}" unless definitions.has_key?(key)
-        
         definitions[key].translate(source)
       end
       

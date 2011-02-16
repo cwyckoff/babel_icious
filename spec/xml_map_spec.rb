@@ -1,5 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
-require File.expand_path(File.dirname(__FILE__) + "/base_map_spec")
+require "spec_helper"
 
 module Babelicious
   
@@ -7,7 +6,7 @@ module Babelicious
 
     before(:each) do 
       @node = mock("Nokogiri::XML::Document::Node", :content => "baz", :children => mock("Nokogiri::XML::Node", :size => 1))
-      @source = mock("Nokogiri::XML::Document", :find => [@node])
+      @source = mock("Nokogiri::XML::Document", :xpath => [@node])
       @path_translator = PathTranslator.new("foo/bar")
       @xml_map = @strategy = XmlMap.new(@path_translator)
     end
@@ -17,7 +16,8 @@ module Babelicious
     describe ".initial_target" do 
       
       it "should return a libxml XML document" do 
-        Nokogiri::XML::Document.stub!(:new).and_return(xml_doc = mock("Nokogiri::XML::Document", :encoding= => nil))
+        xml_doc = mock(Nokogiri::XML::Document, :encoding= => nil)
+        Nokogiri::XML::Document.stub!(:new).and_return(xml_doc)
         
         XmlMap.initial_target.should == xml_doc
       end
@@ -48,7 +48,7 @@ module Babelicious
       
       before(:each) do
         Nokogiri::XML::Node.stub!(:new).and_return(@xml_node = mock("Nokogiri::XML::Node", :empty? => false, :<< => nil))
-        @target_xml = mock("Nokogiri::XML::Document", :root => nil, :find => [@xml_node], :root= => nil)
+        @target_xml = mock("Nokogiri::XML::Document", :root => nil, :xpath => [@xml_node], :root= => nil)
       end
       
       def do_process 
@@ -77,7 +77,7 @@ module Babelicious
       before(:each) do 
         @child_node = mock("Nokogiri::XML::Node")
         @node = mock("Nokogiri::XML::Node", :children => [@child_node], :content => "foo")
-        @source = mock("Nokogiri::XML::Document", :find => [@node])
+        @source = mock("Nokogiri::XML::Document", :xpath => [@node])
       end
       
       describe "when node has only one child" do 
@@ -104,8 +104,7 @@ module Babelicious
       describe "when node is not updated" do 
         
         before(:each) do 
-          @xml_target = Nokogiri::XML::Document.new
-          @target_xml.stub!(:find).and_return([])
+          @xml_target = Nokogiri::XML::Document.parse("")
           @new_node = mock(@xml_node = mock("Nokogiri::XML::Node", :empty? => false, :<< => nil))
         end
 

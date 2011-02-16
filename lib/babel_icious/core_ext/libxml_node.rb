@@ -1,21 +1,16 @@
 require 'nokogiri'
 
-def new_node(name, val=nil, fakecontext=false)
+def new_node(name, val=nil)
   context = Babelicious::Mapper.gc_context
+  context ||= Nokogiri::XML::Document.parse("")
 
-  # gc context can be faked during testing
-  context ||= Nokogiri::XML::Document.new if fakecontext
-
-  node = Nokogiri::XML::Node.new(name, context)
-
-  if(val)
-    val = val.to_s if val.is_a? Numeric
-    node << val
+  if val
+    context.create_element(name, val)
+  elsif block_given?
+    context.create_element(name) {|node| yield node}
   else 
-    yield node if block_given?
+    context.create_element(name)
   end 
-
-  node
 end 
 
 module BabeliciousNodeHacks

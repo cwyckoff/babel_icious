@@ -8,9 +8,9 @@ module Babelicious
     class << self
       
       def initial_target
-        d = Nokogiri::XML::Document.new
-        d.encoding = 'UTF-8'
-        d
+        Nokogiri::XML::Document.new.tap do |d|
+          d.encoding = "UTF-8"
+        end
       end
       
       def filter_source(source)
@@ -31,9 +31,9 @@ module Babelicious
           return node.content
         end
       end
-
-      rescue
-        raise "There was a problem extracting the value from your xml at mapping '#{@path_translator.full_path}'"
+      nil
+    rescue StandardError => e
+      raise "There was a problem extracting the value from your xml at mapping '#{@path_translator.full_path}' #{e.inspect}"
     end
 
     protected
@@ -47,15 +47,15 @@ module Babelicious
         map_from(xml_output, source_value)
       end 
 
-      rescue Exception => e
-        raise "There was a problem mapping the xml output for mapping '#{@path_translator.full_path}' with source value #{source_value}"
+    rescue StandardError => e
+      raise "There was a problem mapping the xml output for mapping '#{@path_translator.full_path}' with source value #{source_value.pretty_inspect} #{e.inspect}"
     end
     
     private
 
     def map_source_value(source_value)
       if(@customized_map)
-        @customized_map.call(source_value)
+        @customized_map.call(source_value).to_s
       else 
         if(source_value.is_a?(String))
           source_value.strip
@@ -63,6 +63,8 @@ module Babelicious
           "true"
         elsif(source_value.is_a?(FalseClass))
           "false"
+        elsif (source_value.is_a?(Numeric))
+          source_value.to_s
         else
           source_value
         end 
@@ -95,7 +97,8 @@ module Babelicious
     def update_node?(xml_output, source_value)
       node = xml_output.xpath("/#{@path_translator.full_path}")
       unless(node.empty?)
-        node[0] << map_source_value(source_value) # source_value.strip unless source_value.nil?
+        value = map_source_value(source_value)
+        node[0] << value
         return true
       end 
     end

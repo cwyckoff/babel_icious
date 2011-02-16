@@ -1,12 +1,15 @@
-require 'rubygems'
-#require 'spec'
+require "rubygems"
+require "rspec"
 require 'ruby-debug'
-$:.unshift(File.dirname(__FILE__) + '/../lib')
-require 'babel_icious'
 
-alias :running :lambda
 
-[:get, :post, :action, :process].each do |action|
+RSpec.configure do |config|
+  $:.unshift(File.dirname(__FILE__) + '/../lib')
+  require 'babel_icious'
+
+  alias :running :lambda
+
+  [:get, :post, :action, :process].each do |action|
   eval %Q{
     def before_#{action}
       yield
@@ -18,5 +21,5 @@ alias :running :lambda
       yield
     end
   }
+  end
 end
-
