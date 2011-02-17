@@ -19,7 +19,7 @@ module Babelicious
 
     describe ".initial_target" do 
       
-      it "should return a libxml XML document" do 
+      it "should return a nokogiri XML document" do
         xml_doc = mock(Nokogiri::XML::Document, :encoding= => nil)
         Nokogiri::XML::Document.stub!(:new).and_return(xml_doc)
         

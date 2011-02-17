@@ -122,4 +122,4 @@ This mapping would produce
 
   {"concatenated_institutions" => "FOO|BAR|BAZ"}
 
-(note: 'concatentate_children' is a convenience method I've added to the libxml XML::Node object)
+(note: 'concatentate_children' is a convenience method I've added to the nokogiri XML::Node object)
