@@ -11,6 +11,10 @@ module Babelicious
       @xml_map = @strategy = XmlMap.new(@path_translator)
     end
 
+    # This is defined in base_map_spec, but cannot be required, because
+    # hash_map_spec would also require it, and that causes a name clash.
+    #
+    # Use bundle exec rspec spec/bash_map_spec.rb spec/xml_map_spec.rb
     it_should_behave_like "an implementation of a mapping strategy"
 
     describe ".initial_target" do 
