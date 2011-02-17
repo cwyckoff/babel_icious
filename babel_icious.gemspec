@@ -23,6 +23,6 @@ spec = Gem::Specification.new do |s|
              "lib/babel_icious/path_translator.rb",
              "lib/babel_icious/map_rule.rb",
              "lib/babel_icious/map_definition.rb",
-             "lib/babel_icious/core_ext/nokogori_xml_node.rb",
+             "lib/babel_icious/core_ext/nokogiri_xml_node.rb",
              "lib/babel_icious/core_ext/enumerable.rb"]
 end
