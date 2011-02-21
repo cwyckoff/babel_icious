@@ -19,7 +19,7 @@ module Babelicious
 
     def initialize
       @path_translator = PathTranslator.new("/")
-    end 
+    end
 
     def self.filter_source(source)
       source

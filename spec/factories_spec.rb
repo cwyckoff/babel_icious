@@ -1,10 +1,10 @@
-require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
+require "spec_helper"
 
 module Babelicious
 
   describe "factories" do
 
-    before(:all) do 
+    before(:each) do
       @direction = {:from => :xml, :to => :hash}
       @xml_map = mock("XmlMap")
       @hash_map = mock("HashMap")

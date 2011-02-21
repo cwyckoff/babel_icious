@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
+require "spec_helper"
 
 module Babelicious
 
@@ -9,8 +9,7 @@ module Babelicious
 end 
 
 
-describe "an implementation of a mapping strategy", :shared => true do
-  
+shared_examples_for "an implementation of a mapping strategy" do
   describe "#dup" do
     
     it "deep dups all of its attributes" do

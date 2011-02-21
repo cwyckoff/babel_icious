@@ -419,8 +419,8 @@ Then /^the customized target should be correctly processed$/ do
   </response>
 </event>
 EOL
-    @translation.to_s.should == translation
   end 
+    @translation.to_s.gsub(/\s/, '').should == translation.to_s.gsub(/\s/, '')
 
 #  @translation.should == {"new_update_status_code"=>[{"name"=>"Abandoned", "text"=>"bad phone"}, {"name"=>"Rejected", "text"=>"bad word"}]}
 #  @translation.should == {"boo" => [{"bum" => "baz", "dum" => "coo"}]}

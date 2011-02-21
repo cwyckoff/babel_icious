@@ -1,5 +1,4 @@
 require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
-require File.expand_path(File.dirname(__FILE__) + "/base_map_spec")
 
 module Babelicious
 
@@ -25,6 +24,10 @@ module Babelicious
       @strategy = HashMap.new(@path_translator)
     end
     
+    # This is defined in base_map_spec, but cannot be required, because
+    # xml_map_spec would also require it, and that causes a name clash.
+    #
+    # Use bundle exec rspec spec/bash_map_spec.rb spec/hash_map_spec.rb
     it_should_behave_like "an implementation of a mapping strategy"
 
     describe "#map_from" do 

@@ -1,23 +1,27 @@
-require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
-require File.expand_path(File.dirname(__FILE__) + "/base_map_spec")
+require "spec_helper"
 
 module Babelicious
   
   describe XmlMap do 
 
     before(:each) do 
-      @node = mock("Xml::Document::Node", :content => "baz", :children => mock("Xml::Document::Node", :size => 1))
-      @source = mock("Xml::Document", :find => [@node])
+      @node = mock("Nokogiri::XML::Document::Node", :content => "baz", :children => mock("Nokogiri::XML::Node", :size => 1))
+      @source = mock("Nokogiri::XML::Document", :xpath => [@node])
       @path_translator = PathTranslator.new("foo/bar")
       @xml_map = @strategy = XmlMap.new(@path_translator)
     end
 
+    # This is defined in base_map_spec, but cannot be required, because
+    # hash_map_spec would also require it, and that causes a name clash.
+    #
+    # Use bundle exec rspec spec/bash_map_spec.rb spec/xml_map_spec.rb
     it_should_behave_like "an implementation of a mapping strategy"
 
     describe ".initial_target" do 
       
-      it "should return a libxml XML document" do 
-        XML::Document.stub!(:new).and_return(xml_doc = mock("XML::Document"))
+      it "should return a nokogiri XML document" do
+        xml_doc = mock(Nokogiri::XML::Document, :encoding= => nil)
+        Nokogiri::XML::Document.stub!(:new).and_return(xml_doc)
         
         XmlMap.initial_target.should == xml_doc
       end
@@ -25,11 +29,11 @@ module Babelicious
 
     describe ".filter_source" do 
       
-      it "should create a new XML::Document using the source string" do 
+      it "should create a new Nokogiri::XML::Document using the source string" do 
         source = '<foo><bar>baz</bar></foo>'
 
         # expect
-        XML::Document.should_receive(:string).with(source)
+        Nokogiri::XML::Document.should_receive(:parse).with(source)
         
         # given
         XmlMap.filter_source(source)
@@ -47,8 +51,8 @@ module Babelicious
     describe "#map_from" do 
       
       before(:each) do
-        XML::Node.stub!(:new).and_return(@xml_node = mock("XML::Node", :empty? => false, :<< => nil))
-        @target_xml = mock("XML::Document", :root => nil, :find => [@xml_node], :root= => nil)
+        Nokogiri::XML::Node.stub!(:new).and_return(@xml_node = mock("Nokogiri::XML::Node", :empty? => false, :<< => nil))
+        @target_xml = mock("Nokogiri::XML::Document", :root => nil, :xpath => [@xml_node], :root= => nil)
       end
       
       def do_process 
@@ -75,9 +79,9 @@ module Babelicious
     describe "#value_from" do 
 
       before(:each) do 
-        @child_node = mock("XML::Node")
-        @node = mock("XML::Node", :children => [@child_node], :content => "foo")
-        @source = mock("XML::Document", :find => [@node])
+        @child_node = mock("Nokogiri::XML::Node")
+        @node = mock("Nokogiri::XML::Node", :children => [@child_node], :content => "foo")
+        @source = mock("Nokogiri::XML::Document", :xpath => [@node])
       end
       
       describe "when node has only one child" do 
@@ -104,9 +108,8 @@ module Babelicious
       describe "when node is not updated" do 
         
         before(:each) do 
-          @xml_target = XML::Document.new
-          @target_xml.stub!(:find).and_return([])
-          @new_node = mock(@xml_node = mock("XML::Node", :empty? => false, :<< => nil))
+          @xml_target = Nokogiri::XML::Document.parse("")
+          @new_node = mock(@xml_node = mock("Nokogiri::XML::Node", :empty? => false, :<< => nil))
         end
 
         def do_process

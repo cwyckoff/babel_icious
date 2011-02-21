@@ -1,4 +1,4 @@
-require 'xml'
+require 'nokogiri'
 
 module Babelicious
   
@@ -8,27 +8,32 @@ module Babelicious
     class << self
       
       def initial_target
-        XML::Document.new
+        Nokogiri::XML::Document.new.tap do |d|
+          d.encoding = "UTF-8"
+        end
       end
       
       def filter_source(source)
-        XML::Document.string(source)
+        Nokogiri::XML::Document.parse(source)
       end
       
     end
     
     def initialize(path_translator, opts={})
-      @path_translator, @opts = path_translator, opts
+      @path_translator, @opts, @gc_context = path_translator, opts, Nokogiri::XML::Document.new
     end
     
     def value_from(source)
-      source.find("/#{@path_translator.full_path}").each do |node|
+      source.xpath("/#{@path_translator.full_path}").each do |node|
         if(node.children.size > 1)
           return node
         else
           return node.content
         end
       end
+      nil
+    rescue StandardError => e
+      raise "There was a problem extracting the value from your xml at mapping '#{@path_translator.full_path}' #{e.inspect}"
     end
 
     protected
@@ -41,16 +46,25 @@ module Babelicious
         populate_nodes(xml_output)
         map_from(xml_output, source_value)
       end 
+
+    rescue StandardError => e
+      raise "There was a problem mapping the xml output for mapping '#{@path_translator.full_path}' with source value #{source_value.pretty_inspect} #{e.inspect}"
     end
     
     private
 
     def map_source_value(source_value)
       if(@customized_map)
-        @customized_map.call(source_value)
+        @customized_map.call(source_value).to_s
       else 
         if(source_value.is_a?(String))
           source_value.strip
+        elsif(source_value.is_a?(TrueClass))
+          "true"
+        elsif(source_value.is_a?(FalseClass))
+          "false"
+        elsif (source_value.is_a?(Numeric))
+          source_value.to_s
         else
           source_value
         end 
@@ -61,7 +75,7 @@ module Babelicious
       return if @index == 0
 
       if(node = previous_node(xml_output))
-        new_node = XML::Node.new(@path_translator[@index+1])
+        new_node = Nokogiri::XML::Node.new(@path_translator[@index+1], xml_output)
         node << new_node
       else 
         populate_nodes(xml_output)
@@ -70,20 +84,21 @@ module Babelicious
 
     def previous_node(xml_output)
       @index -= 1
-      node = xml_output.find("//#{@path_translator[0..@index].join("/")}")
+      node = xml_output.xpath("//#{@path_translator[0..@index].join("/")}")
       node[0]
     end
     
     def set_root(xml_output)
       if xml_output.root.nil?
-        xml_output.root = XML::Node.new(@path_translator[0])
+        xml_output.root = Nokogiri::XML::Node.new(@path_translator[0], xml_output)
       end 
     end
     
     def update_node?(xml_output, source_value)
-      node = xml_output.find("/#{@path_translator.full_path}")
+      node = xml_output.xpath("/#{@path_translator.full_path}")
       unless(node.empty?)
-        node[0] << map_source_value(source_value) # source_value.strip unless source_value.nil?
+        value = map_source_value(source_value)
+        node[0] << value
         return true
       end 
     end

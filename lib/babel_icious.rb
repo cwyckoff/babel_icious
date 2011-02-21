@@ -1,10 +1,10 @@
 require 'rubygems'
-require 'xml'
+require 'nokogiri'
 
 $LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__))) unless $LOAD_PATH.include?(File.expand_path(File.dirname(__FILE__)))
 
 require "babel_icious/core_ext/enumerable"
-require "babel_icious/core_ext/libxml_node"
+require "babel_icious/core_ext/nokogiri_xml_node"
 require "babel_icious/map_rule"
 require "babel_icious/map_definition"
 require "babel_icious/map_factory"
