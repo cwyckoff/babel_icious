@@ -1,8 +1,7 @@
 require 'nokogiri'
 
 def new_node(name, val=nil)
-  context = Babelicious::Mapper.gc_context
-  context ||= Nokogiri::XML::Document.parse("")
+  context = Babelicious::Mapper.document || Nokogiri::XML::Document.new
 
   if val
     context.create_element(name, val)
