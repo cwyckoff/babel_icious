@@ -20,7 +20,7 @@ module Babelicious
     end
     
     def initialize(path_translator, opts={})
-      @path_translator, @opts, @gc_context = path_translator, opts, Nokogiri::XML::Document.new
+      @path_translator, @opts = path_translator, opts
     end
     
     def value_from(source)

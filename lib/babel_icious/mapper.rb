@@ -5,7 +5,7 @@ module Babelicious
   class Mapper
     
     class << self
-      attr_reader :direction, :current_map_definition_key
+      attr_reader :direction, :current_map_definition_key, :document
 
       def [](key)
         definitions[key.to_sym]
@@ -66,6 +66,7 @@ module Babelicious
       
       def translate(key=nil, source=nil)
         raise MapperError, "No target mapper exists for key #{key}" unless definitions.has_key?(key)
+        reset_document
         definitions[key].translate(source)
       end
       
@@ -77,10 +78,6 @@ module Babelicious
       def when(&block)
         current_map_definition.register_condition(:when, nil, &block)
       end
-
-      def gc_context
-        current_map_definition.gc_context
-      end
       
       private
       
@@ -90,6 +87,14 @@ module Babelicious
       
       def mapping_already_exists?(key)
         definitions.keys.include?(key)
+      end
+      
+      def reset_document
+        @document = Babelicious::XmlMap.initial_target if translation_includes?('xml')
+      end
+      
+      def translation_includes?(mapping_object)
+        @direction.values.map(&:to_s).include?(mapping_object)
       end
 
     end

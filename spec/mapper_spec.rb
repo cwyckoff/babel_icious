@@ -181,6 +181,15 @@ module Babelicious
         end
       end
 
+      it "should call reset_document" do
+        # expect
+        Mapper.should_receive(:reset_document)
+        
+        # given
+        @map_definition.stub!(:translate).and_return({})
+        Mapper.translate(:foo, @xml)
+      end
+
       it "should map target elements" do 
         # expect
         @map_definition.should_receive(:translate).with(@xml).and_return({})
