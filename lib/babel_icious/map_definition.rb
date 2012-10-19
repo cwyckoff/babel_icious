@@ -3,7 +3,7 @@ class MapDefinitionError < Exception; end
 module Babelicious
 
   class MapDefinition
-    attr_reader :rules, :direction, :gc_context
+    attr_reader :rules, :direction
     
     def initialize
       @rules = []
@@ -51,8 +51,7 @@ module Babelicious
     def register_rule(opts={})
       raise MapDefinitionError, "Both :from and :to keys must be set (e.g., {:from => \"foo/bar\", :to => \"bar/foo\")" unless (opts[:from] && opts[:to])
       
-      @rules << MapRule.new(MapFactory.source(@direction, opts), t = MapFactory.target(@direction, opts))
-      @gc_context ||= t.gc_context
+      @rules << MapRule.new(MapFactory.source(@direction, opts), MapFactory.target(@direction, opts))
       @rules
     end
     
@@ -62,8 +61,7 @@ module Babelicious
 
     def register_prepopulate(target_data)
       source_proxy = SourceProxy.new
-      @rules << MapRule.new(source_proxy, t = MapFactory.target(@direction, {:to => target_data}))
-      @gc_context ||= t.gc_context
+      @rules << MapRule.new(source_proxy, MapFactory.target(@direction, {:to => target_data}))
       source_proxy
     end
 
@@ -71,7 +69,6 @@ module Babelicious
       raise MapDefinitionError, "You must call the .from method before customizing the .to method (e.g., m.from(\"foo\").to {|value| ...}" unless @rules.last
 
       target = MapFactory.target(@direction, {:to => '', :to_proc => block})
-      @gc_context ||= target.gc_context
       @rules.last.target = target
     end
 
