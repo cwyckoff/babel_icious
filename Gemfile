@@ -1,5 +1,3 @@
-require 'rbconfig'
-
 source 'http://gems.lmpcloud.com'
 source 'https://rubygems.org'
 
